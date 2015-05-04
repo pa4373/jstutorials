@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Wei-Shao Tang" />
+  <meta name="dcterms.date" content="2015-04-15" />
+  <title>JavaScript: Core Part</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="reveal.js/css/reveal.min.css"/>
+    <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #303030; color: #cccccc; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #cccccc; background-color: #303030; }
+code > span.kw { color: #f0dfaf; }
+code > span.dt { color: #dfdfbf; }
+code > span.dv { color: #dcdccc; }
+code > span.bn { color: #dca3a3; }
+code > span.fl { color: #c0bed1; }
+code > span.ch { color: #dca3a3; }
+code > span.st { color: #cc9393; }
+code > span.co { color: #7f9f7f; }
+code > span.ot { color: #efef8f; }
+code > span.al { color: #ffcfaf; }
+code > span.fu { color: #efef8f; }
+code > span.er { color: #c3bf9f; }
+    </style>
+    <link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+      if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+      }
+    </script>
+    <!--[if lt IE 9]>
+    <script src="reveal.js/lib/js/html5shiv.js"></script>
+    <![endif]-->
+    <script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">JavaScript: Core Part</h1>
+    <h2 class="author">Wei-Shao Tang</h2>
+    <h3 class="date">April 15, 2015</h3>
+</section>
+<section id="TOC">
+<ul>
+<li><a href="#/who-am-i">Who am I?</a></li>
+<li><a href="#/why-javascript">Why JavaScript?</a></li>
+<li><a href="#/language">Language</a><ul>
+<li><a href="#/ecmascript">ECMAScript</a></li>
+</ul></li>
+<li><a href="#/core-part">Core Part</a></li>
+<li><a href="#/primitive-type-and-variables">Primitive Type and Variables</a></li>
+<li><a href="#/string">String</a></li>
+<li><a href="#/control-structure">Control Structure</a></li>
+<li><a href="#/function">Function</a></li>
+<li><a href="#/array">Array</a></li>
+<li><a href="#/object">Object</a></li>
+</ul>
+</section>
+
+<section><section id="who-am-i" class="titleslide slide level1"><h1>Who am I?</h1></section><section class="slide level2">
+
+<h3 id="about-myself">About Myself</h3>
+<ul>
+<li>Master in IM, NTU (2014 - )</li>
+<li><p>BS in MIS, NCCU (2010 - 2014)</p></li>
+<li><p><em>I'm interested in</em> Web Programming, Functional Programming<br /><em>I write codes in:</em> Python, JavaScript,<br /><em>For now, I am learning:</em> Haskell, LISP</p></li>
+<li><p><em>My mail is:</em> pa4373 &lt;at&gt; gmail.com<br /><em>Along with my:</em> Skype, LINE ID: pa4373, <a href="https://github.com/pa4373" class="uri">https://github.com/pa4373</a></p></li>
+</ul>
+</section></section>
+<section><section id="why-javascript" class="titleslide slide level1"><h1>Why JavaScript?</h1></section><section class="slide level2">
+
+<p>&quot;JavaScript is eating the world.&quot;</p>
+</section><section class="slide level2">
+
+<ul>
+<li>JavaScript is dominant in the World Wide Web.</li>
+<li>#1 Programming language, according to popularity on GitHub and StackOverflow. (<a href="http://redmonk.com/sogrady/2015/01/14/language-rankings-1-15/">source</a>)</li>
+<li>It runs everywhere. Web client, desktop / mobile app, server, embedded system and such.</li>
+<li>It got more than 40K+ jobs on LinkedIn, closely following Java jobs.</li>
+<li>Many languages now can compiled to JavaScript. (web assembly)</li>
+</ul>
+</section><section class="slide level2">
+
+<iframe width="853" height="480" src="https://www.youtube.com/embed/c2uNDlP4RiE" frameborder="0" allowfullscreen>
+</iframe>
+<p><a href="https://www.youtube.com/watch?v=c2uNDlP4RiE">Unreal engine 4 run on Firefox</a></p>
+</section><section class="slide level2">
+
+<iframe width="853" height="480" src="https://www.youtube.com/embed/hfq2SisPvCU" frameborder="0" allowfullscreen>
+</iframe>
+<p><a href="https://www.youtube.com/watch?v=hfq2SisPvCU">Leap Motion Node Drone Flight in 2013</a></p>
+</section></section>
+<section><section id="language" class="titleslide slide level1"><h1>Language</h1></section><section class="slide level2">
+
+<h3 id="specification-vs.-implementation">Specification vs. Implementation</h3>
+<ul>
+<li>Specification
+<ul>
+<li>What makes a piece of code a program, and what its behaviour shall be.</li>
+<li>Syntax (form)</li>
+<li>Semantic (meaning)</li>
+</ul></li>
+<li>Implementation
+<ul>
+<li>System for executing computer program. (Compiler, Interpreter, Runtime and etc.)</li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="little-analogy">Little Analogy</h3>
+<ul>
+<li>&quot;Google that yourself&quot;
+<ul>
+<li>which means finding something with Google Search Engine.</li>
+</ul></li>
+<li>Reese opened Firefox, went to <a href="https://www.google.com/" class="uri">https://www.google.com/</a> and searched for something.</li>
+<li>Finch opened Chrome, went to <a href="https://www.google.co.uk/" class="uri">https://www.google.co.uk/</a> and searched for something.</li>
+<li>Reese and Finch did same things, but with different approaches. (Different implementors)</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="back-to-javascript">Back to JavaScript</h3>
+<ul>
+<li><p>By syntax rules, the following piece of code is a program:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> id = <span class="kw">function</span> (obj) {
+  <span class="kw">return</span> obj;
+};</code></pre></li>
+<li><p>Semantic: declare a function named <strong>id</strong> which takes one object and return exactly the same object.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="what-about-implementation">What about Implementation?</h3>
+<ul>
+<li>Several existing implementations, referred to <strong>JavaScript engine</strong>:
+<ul>
+<li>the program executes JavaScript, usually called <strong>Process Virtual Machine</strong>.</li>
+</ul></li>
+<li>Popular ones such as <a href="https://en.wikipedia.org/wiki/V8_engine">Google's V8</a>, <a href="https://en.wikipedia.org/wiki/SpiderMonkey_(software)">Mozilla's SpiderMonkey</a>, <a href="https://en.wikipedia.org/wiki/Rhino_(JavaScript_engine)">Rhino</a></li>
+<li>Don't reinvent the wheel:
+<ul>
+<li>Lots of functions are pre-built, as libraries.
+<ul>
+<li>SpiderMonkey + Gekco <span class="math">\(\rightarrow\)</span> Firefox</li>
+<li>V8 + WebKit <span class="math">\(\rightarrow\)</span> Chrome</li>
+<li>V8 + Few networking libraries <span class="math">\(\rightarrow\)</span> Node.js</li>
+</ul></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="standardization">Standardization</h3>
+<ul>
+<li>If we have so many implementations, what guarantees that they all follow the specification? (Compatibility)</li>
+<li><a href="https://en.wikipedia.org/wiki/Standardization">Standardization</a>: the process of developing and implementing technical standards.
+<ul>
+<li>Few groups known for standardization: <a href="https://en.wikipedia.org/wiki/International_Organization_for_Standardization">ISO</a>, <a href="https://en.wikipedia.org/wiki/American_National_Standards_Institute">ANSI</a>, <a href="https://en.wikipedia.org/wiki/ECMA">ECMA</a>.</li>
+</ul></li>
+</ul>
+</section><section id="ecmascript" class="slide level2">
+<h1>ECMAScript</h1>
+<ul>
+<li>In 1996, Netscape filed the application to ECMA, and it was released as ECMAScript 1 in 1997.</li>
+<li>For now, the mainstream is ECMAScript 5, released in 2009, supported by most of modern browsers.</li>
+<li>While the browsers don't always stick to the specification, it's good to take it as the guideline.</li>
+</ul>
+</section></section>
+<section><section id="core-part" class="titleslide slide level1"><h1>Core Part</h1></section><section class="slide level2">
+
+<h3 id="core-part-1">Core Part</h3>
+<ul>
+<li>It's beneficial to understand the relationship of components of the language, due to the rich (and sophisticated) ecosystem of JavaScript.</li>
+<li>Although you need different knowledge for different environments, the common part stands out as the core part.</li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>This tutorial is dedicated to the core part of the language.
+<ul>
+<li>We won't talk about how to interact with browsers or write server program, yet...</li>
+<li><strong>INSTEAD</strong> we focus on components allows you to mentally model your application.</li>
+</ul></li>
+</ul>
+<blockquote>
+<p>&quot;A language that doesn't affect the way you think about programming, is not worth knowing.&quot; ~ Alan Peris (1922 – 1990)</p>
+</blockquote>
+</section><section class="slide level2">
+
+<ul>
+<li><del>&quot;No, I just want to get my job done, it doesn't matter my codes all look like the same.&quot;</del>
+<ul>
+<li>To better understand the usage pattern of others' libraries.</li>
+<li>To design the program easier for others to understand.</li>
+<li>For fun, and make yourself look smart.</li>
+</ul></li>
+<li>Like learning English, you will do better likely if you appreciate its culture.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="repl-readevalprint-loop">REPL (Read–eval–print loop)</h3>
+<ul>
+<li>The environment <strong>reads</strong> input from user, <strong>evaluates</strong> them as code at <strong>the given context</strong>, <strong>prints</strong> the result, and <strong>loops</strong> back.</li>
+<li>Great for learning, debugging and experimental programming. <img src="assets/repl-firefox.gif" alt="REPL on Firefox" /></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="repl-readevalprint-loop-1">REPL (Read–eval–print loop)</h3>
+<ul>
+<li>Most browsers have built-in REPL:
+<ul>
+<li>for Firefox and Chrome: Right click on the web page, choose &quot;Inspect Element&quot; and select &quot;Console&quot; tab on the developer panel.</li>
+</ul></li>
+<li>Firefox will be used through the following demonstration.</li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>Type <code>1 + 1;</code> and then press &quot;Enter&quot;, it will output <code>2</code>. <img src="assets/repl-illustration.gif" alt="Illustration of REPL" /></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><p>To represent the process of using REPL, we take the following form from now on:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> id = <span class="kw">function</span> (obj) {
+  <span class="kw">return</span> obj;
+};
+<span class="co">//: undefined</span></code></pre>
+<ul>
+<li>where '//: ' stands for program output. the input can be divided in multiple lines.</li>
+</ul></li>
+<li>Make a newline instead of evaluating: &quot;Shift&quot; + &quot;Enter&quot; <img src="assets/repl-notation.gif" /></li>
+<li><p>(<code>//</code> for single-line comment.)</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="exercise-5-mins">Exercise (~5 mins)</h3>
+<ul>
+<li><p>Fire up REPL and type following statements (ends with ;) in sequence by instructions, try and discuss the outputs of REPL:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// program 1.</span>
+<span class="st">&quot;I thought Felicity Jones was me.&quot;</span>;
+<span class="co">// program 2.</span>
+<span class="kw">var</span> janeHawkingSay = <span class="kw">function</span> () {
+  <span class="kw">return</span> <span class="st">&quot;I thought Felicity Jones was me.&quot;</span>;
+};
+<span class="co">// program 3, it only works after program 2 is evaluated.</span>
+<span class="fu">janeHawkingSay</span>();</code></pre></li>
+<li><p>Don't copy &amp; paste, muscle memory helps learn a new language.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="some-facts-about-this-little-exercise">Some facts about this little exercise</h3>
+<ul>
+<li>Each statement ends with semicolon (;)
+<ul>
+<li>Just like each sentence in English ends with period.</li>
+</ul></li>
+<li>By convention, the naming rule of JavaScript is Camel-Case.</li>
+<li>The indentation use two spaces, not tab.</li>
+<li>When declaring a function, there's one space between <code>function</code> keyword and argument list.</li>
+</ul>
+</section></section>
+<section><section id="primitive-type-and-variables" class="titleslide slide level1"><h1>Primitive Type and Variables</h1></section><section class="slide level2">
+
+<h3 id="repl-as-calculator">REPL as Calculator</h3>
+<ul>
+<li><p>We have seen that how to use REPL to do addition:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="dv">1</span> + <span class="dv">1</span>;
+<span class="co">//: 2</span></code></pre></li>
+<li><p>Multiplication:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="dv">2</span> * <span class="dv">5</span> * <span class="dv">13</span>;
+<span class="co">//: 130</span></code></pre></li>
+<li><p>Combine them together:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">(<span class="dv">1</span> + <span class="dv">1000</span>) * <span class="dv">1000</span> / <span class="dv">2</span>;
+<span class="co">//: 500500</span></code></pre></li>
+<li><p>This does the same for subtraction (-), division (/).</p></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><p>We can also compare them:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="dv">2</span> &gt; <span class="dv">8</span>;
+<span class="co">//: false</span></code></pre>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="dv">10</span> &gt;= <span class="dv">10</span>;
+<span class="co">//: true</span></code></pre></li>
+<li>The statement we've seen so far is called <strong>expression</strong>, which means it's evaluated by interpreter and the result value is produced and returned.</li>
+<li><p>Wait, what is <code>false</code>?</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="data-type">Data Type</h3>
+<ul>
+<li>Data type is very important, since it determines:
+<ul>
+<li>The possible values (range)</li>
+<li>Operations allowed to be done</li>
+<li><a href="http://en.wikipedia.org/wiki/Data_type">and etc.</a></li>
+</ul></li>
+<li>In JavaScript, data type can be categorised into:
+<ul>
+<li>Primitive Types: the basic unit provided by JavaScript.</li>
+<li>Composite Types: can be constructed from primitive values and composite values.</li>
+<li>Special Types: <code>Null</code>, <code>Undefined</code>. (will talk about it later.)</li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="primitive-types">Primitive Types</h3>
+<ul>
+<li>Referred to built-in data structures, and they are:
+<ul>
+<li>Atomic: can't be broken down into smaller data type.</li>
+<li>Immutable: once the value is decided, it can't be changed.</li>
+</ul></li>
+<li>In ES5, primitive types are:
+<ul>
+<li>Boolean</li>
+<li>Number</li>
+<li>String</li>
+</ul></li>
+<li>It's fair to assume that <code>false</code> seen in the previous slides is type of Boolean.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="boolean-type">Boolean Type</h3>
+<ul>
+<li>Only contains two values: <span class="math">\(\{ true, false \}\)</span></li>
+<li>It denotes the truth value of one proposition, such as:
+<ul>
+<li><code>7*7 === 49</code></li>
+<li><code>10 &gt; 2</code></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="logical-operations">Logical Operations:</h3>
+<ul>
+<li>Take one or two boolean value, produces a new value by:</li>
+<li><p>Negation (not): <code>!</code></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">!<span class="kw">true</span>;
+<span class="co">//: false</span></code></pre></li>
+<li><p>Conjunction (and): <code>&amp;&amp;</code></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">true</span> &amp;&amp; <span class="kw">false</span>;
+<span class="co">//: false</span></code></pre></li>
+<li><p>Disjunction (or): <code>||</code></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">false</span> || <span class="kw">true</span>;
+<span class="co">//: true</span></code></pre></li>
+<li><p>Negation has higher precedence than conjunction and disjunction.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="number-type">Number Type</h3>
+<ul>
+<li>Only one number type: the double-precision 64-bit binary format IEEE 754 value (number between -(<span class="math">\(2^{53} - 1\)</span>) and <span class="math">\(2^{53} -1\)</span>)
+<ul>
+<li>Nah, basically you just need to remember it got double type internally.</li>
+</ul></li>
+<li><strong>There is no specific type for integers.</strong></li>
+<li>No need to worry about integer overflow.</li>
+<li><p>Everything not within the range goes: <code>Infinity</code></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="dv">2</span> / <span class="dv">0</span>;
+<span class="co">//: Infinity</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="number-type-1">Number Type</h3>
+<ul>
+<li>Unary operator: <code>-</code> (signed)</li>
+<li>Binary operators: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%</code> (mod)</li>
+<li><p>Operations on float-point numbers is tricky: <a href="http://floating-point-gui.de/">more</a></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="fl">0.1</span> + <span class="fl">0.2</span>;
+<span class="co">//: 0.30000000000000004</span></code></pre>
+<ul>
+<li><p>While normally it didn't affect the usage, sometimes you may need precise result. Scale to integer and dividing later:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">(<span class="fl">0.1</span>*<span class="dv">10</span> + <span class="fl">0.2</span>*<span class="dv">10</span>) / <span class="dv">10</span>;
+<span class="co">//: 0.3</span></code></pre></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="number-type-2">Number Type</h3>
+<ul>
+<li><code>NaN</code>: 'not a number' (although it has number type)</li>
+<li><p>Can be made when converting a illegal string to number:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="fu">parseInt</span>(<span class="st">&#39;oops&#39;</span>, <span class="dv">10</span>);
+<span class="co">//: NaN</span></code></pre></li>
+<li><p>you can test a number with <code>isNaN</code> function.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="fu">isNaN</span>(<span class="dv">10</span>);
+<span class="co">//: false</span></code></pre>
+<ul>
+<li>If <strong>isNaN</strong> returns false, the input is or can be parsed to number type.</li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="comparison-and-equivalence">Comparison and Equivalence</h3>
+<ul>
+<li><p>You can compare numbers with <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="dv">2</span> &gt;= <span class="dv">8</span>;
+<span class="co">//: false</span></code></pre></li>
+<li>The result got boolean type.</li>
+<li>Equivalence is a little tricky:
+<ul>
+<li><p>Stick to <code>===</code>, <code>!==</code> instead of <code>==</code>, <code>!=</code></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="dv">0</span> == <span class="kw">false</span>;
+<span class="co">//: true</span>
+<span class="dv">0</span> === <span class="kw">false</span>;
+<span class="co">//: false</span></code></pre></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="ternary-operator">Ternary Operator</h3>
+<ul>
+<li>An operator in the sense of <code>IF-THEN-ELSE</code>.</li>
+<li><code>PROPOSITION ? EXPRESSION 1 : EXPRESSION 2</code></li>
+<li><p>If PROPOSITION is <code>true</code> then return EXPRESSION 1, else return EXPRESSION 2.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">(<span class="dv">2</span> &gt; <span class="dv">8</span>) ? <span class="dv">689</span> : <span class="dv">633</span>;
+<span class="co">//: 633</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="variable">Variable</h3>
+<ul>
+<li>The programs we've seen so far were written in one-line expression.</li>
+<li>We need some way to save the result for later use, <strong>at the given context</strong>.</li>
+<li><strong>Variable</strong>, serving as program's memory, is a popular way to address the problem.
+<ul>
+<li>Variable in the sense of computer architecture, not mathematically.</li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="variable-1">Variable</h3>
+<ul>
+<li>Variable is composed of an identifier and its value. (the value may not be defined.)</li>
+<li><p>Consider the following program:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> x; <span class="co">// x is identifier.</span>
+<span class="co">//: undefined</span>
+x; <span class="co">// for now, x has not contained any value, yet.</span>
+<span class="co">//: undefined</span>
+x = <span class="dv">3</span>;
+<span class="co">//: 3</span>
+x; <span class="co">// x contains 3 now.</span>
+<span class="co">//: 3</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="declaration">Declaration</h3>
+<ul>
+<li>New local variable is declared with keyword <code>var</code>, along with identifier.</li>
+<li>If you skip <code>var</code> keyword, the variable became global, which is very evil.</li>
+<li>The identifier is case-sensitive.</li>
+<li><p>Don't need to specify the data type.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> x;</code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="assignment">Assignment</h3>
+<ul>
+<li><p>To assign a value to a variable, put the value / expression on RHS, the variable on LHS of <code>=</code>.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">x = <span class="dv">3</span>;
+<span class="co">//: 3</span></code></pre></li>
+<li>When the assignment occurs, the value is returned immediately.</li>
+<li><p>If a variable is declared, but has not been assigned, the value of the variable is <code>undefined</code>.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> x;
+<span class="co">//: undefined</span>
+x;
+<span class="co">//: undefined</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="assignment-1">Assignment</h3>
+<ul>
+<li><p>Assignment can occurs more than one time, with value in different data type.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> x;
+<span class="co">//: undefined</span>
+x = <span class="dv">0</span>;
+<span class="co">//: 0</span>
+x = <span class="kw">false</span>;
+<span class="co">//: false</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="shortcut">Shortcut</h3>
+<ul>
+<li>The following is not necessary to construct program.</li>
+<li><p>Declaration and assignment:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> x = <span class="dv">0</span>;
+<span class="co">//: undefined // notice that the value is not returned in the case.</span>
+x
+<span class="co">//: 0</span></code></pre></li>
+<li><p>Operator and assignment <code>+=</code>:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> x = <span class="dv">10</span>;
+<span class="co">//: undefined</span>
+x += <span class="dv">10</span> <span class="co">// the same as x = x + 10</span>
+<span class="co">//: 20</span></code></pre>
+<ul>
+<li>The same goes with <code>-=</code>, <code>*=</code>, <code>/=</code>, <code>%=</code></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="null"><code>null</code></h3>
+<ul>
+<li><p>The value null is a JavaScript literal representing null or an &quot;empty&quot; value, i.e. no object value is present.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">null</span>;
+<span class="co">//: null</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="null-vs-undefined"><code>null</code> vs <code>undefined</code></h3>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">null</th>
+<th style="text-align: left;">undefined</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">as the parameters of function which is not a object.</td>
+<td style="text-align: left;">the variable is declared but not assigned, yet.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">as the top of prototype chains</td>
+<td style="text-align: left;">some parameters is missing when the function is applied.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">the property of object doesn't exist.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">the function doesn't return values (<em>void</em> vs <em>undefined</em>)</td>
+</tr>
+</tbody>
+</table>
+</section><section class="slide level2">
+
+<h3 id="falsy-values">Falsy values</h3>
+<ul>
+<li>The values which act like <code>false</code> in boolean operations.</li>
+<li>Falsy values in JavaScript:
+<ul>
+<li><code>false</code></li>
+<li><code>0</code> (zero)</li>
+<li><code>&quot;&quot;</code> (empty string)</li>
+<li><code>null</code></li>
+<li><code>undefined</code></li>
+<li><p><code>NaN</code> (a special Number value meaning Not-a-Number!)</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">undefined</span> || <span class="kw">true</span>;
+<span class="co">//: true</span></code></pre></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="exercises">Exercises</h3>
+<ul>
+<li>In REPL, use <em>variables</em>, <em>addition / subtraction / multiplication / division</em> to perform the following algorithms. Finally, use comparison to determine the result is correct.
+<ul>
+<li>You shall be familiar with <em>variable</em>, <em>arithmetic operations</em>, <em>comparison</em>, <em>Boolean value</em></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>Mobile Number Magic: (It has to be 9 digits, and you might assume it's 891230567.)
+<ol type="1">
+<li>Write down the first 5 digits.</li>
+<li>Multiple 80 with that number.</li>
+<li>Plus 1 to that number.</li>
+<li>Multiple 250 with that number.</li>
+<li>Plus the last 4 digits, <strong>twice!</strong></li>
+<li>Minus 250.</li>
+<li>Using comparison to check if it's your mobile number.</li>
+<li>If it's your number, we're done here. If not, divide it by 2.</li>
+<li>Repeat step 7 again.</li>
+</ol></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>Note: This can be seen as:
+<ul>
+<li><span class="math">\(2 (a \times 10^{4} + b) = a \times 2 \times 10^{4} + 2b\)</span></li>
+<li><span class="math">\(= (a \times 80 + 1) \times 250 + 2b - 250\)</span></li>
+</ul></li>
+<li>if a has 5 digits and b has 4 digits, it reflects your mobile number structure.</li>
+</ul>
+</section></section>
+<section><section id="string" class="titleslide slide level1"><h1>String</h1></section><section class="slide level2">
+
+<h3 id="string-1">String</h3>
+<ul>
+<li><p>String is a finite sequence of characters, usually used to represent text.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="st">&#39;Haaaaave you met Ted?&#39;</span>;
+<span class="co">//: &#39;Haaaaave you met Ted?&#39;</span></code></pre></li>
+<li>To construct a string, put things in double / single quotes (single is preferable.)</li>
+<li><p><strong>There is no specific type for characters.</strong></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> char = <span class="st">&#39;a&#39;</span>;</code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="and-casting"><code>+</code> and Casting</h3>
+<ul>
+<li><p>Consider the program:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> slapCount = <span class="dv">5</span>;
+<span class="co">//: undefined</span>
+<span class="st">&#39;I</span><span class="ch">\&#39;</span><span class="st">m going to go with &#39;</span> + slapCount + <span class="st">&#39; slaps for eternity.&#39;</span>;
+<span class="co">//: &quot;I&#39;m going to go with 5 slaps for eternity.&quot;</span></code></pre>
+<ul>
+<li>Notice that <code>\</code> as esacpe char before <code>'</code> in the string.</li>
+</ul></li>
+<li><code>+</code> stands for concatenation when at least one of operand is String.
+<ul>
+<li><p>It will attempt to call <code>toString</code> method on non-string operand.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="ot">slapCount</span>.<span class="fu">toString</span>();
+<span class="co">//: &quot;5&quot;</span></code></pre></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="parse-and-casting"><code>parse*</code> and Casting</h3>
+<ul>
+<li><code>parseInt(str, base)</code></li>
+<li><code>parseFloat(str)</code></li>
+<li><pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="fu">parseInt</span>(<span class="st">&#39;3.1415926&#39;</span>, <span class="dv">10</span>);
+<span class="co">//: 3</span>
+<span class="fu">parseFloat</span>(<span class="st">&#39;3.1415926&#39;</span>);
+<span class="co">//: 3.1415926</span>
+<span class="fu">parseFloat</span>(<span class="st">&#39;Legen...Wait for it...Dary&#39;</span>);
+<span class="co">//: NaN</span></code></pre></li>
+<li>Keep in mind that parseInt better goes with base.</li>
+<li>Anything failed to be parsed will be represented as <code>NaN</code></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="string-has-properties">String Has Properties</h3>
+<ul>
+<li>Most string properties are accessible in the form of:
+<ul>
+<li>variableName.<em>property</em></li>
+</ul></li>
+<li><p>Property can be function, and thus can be applied.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> wetWetWet = <span class="st">&#39;I feel it in my fingers I feel it in my toes&#39;</span>;
+<span class="co">//: undefined</span>
+<span class="ot">wetWetWet</span>.<span class="fu">length</span>; <span class="co">// property</span>
+<span class="co">//: 44</span>
+<span class="ot">wetWetWet</span>.<span class="fu">toUpperCase</span>(); <span class="co">// function invocation / application.</span>
+<span class="co">//: &quot;I FEEL IT IN MY FINGERS I FEEL IT IN MY TOES&quot;</span>
+<span class="ot">wetWetWet</span>.<span class="fu">toUpperCase</span>; <span class="co">// refers to function itself</span>
+<span class="co">//: function toUpperCase()</span>
+<span class="st">&#39;I am gonna be angry!&#39;</span>.<span class="fu">replace</span>(<span class="st">&#39;gonna be &#39;</span>, <span class="st">&#39;&#39;</span>).<span class="fu">toUpperCase</span>();
+<span class="co">//: &quot;I AM ANGRY!&quot;</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="some-methods-on-string">Some methods on String</h3>
+<ul>
+<li><em>string</em>.charAt(<em>k</em>): get the character at position <em>k</em>, or '' if <em>k</em> is not in the range of string length.</li>
+<li><em>string</em>.length: get the length of the string</li>
+<li><p><em>string</em>.replace(<em>searchString</em>, <em>replaceString</em>): Make new string by replacing <em>searchString</em> with <em>replaceString</em> in <em>string</em></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> wetWetWet = <span class="st">&#39;I feel it in my fingers I feel it in my toes&#39;</span>;
+<span class="co">//: undefined</span>
+<span class="ot">wetWetWet</span>.<span class="fu">length</span>;
+<span class="co">//: 44</span>
+<span class="ot">wetWetWet</span>.<span class="fu">charAt</span>(<span class="dv">13</span>);
+<span class="co">//: &quot;m&quot;</span>
+<span class="ot">wetWetWet</span>.<span class="fu">replace</span>(<span class="st">&#39;I&#39;</span>, <span class="st">&#39;i&#39;</span>);
+<span class="co">//: &quot;i feel it in my fingers i feel it in my toes&quot;</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="some-methods-on-string-1">Some methods on String</h3>
+<ul>
+<li><em>string</em>.indexOf(<em>searchString</em>, <em>[position]</em>): the position of the searchString in string, starts from 0, from left to right.
+<ul>
+<li><em>position</em>: The position to start search, default to 0.</li>
+<li><p>return -1 if not found.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> spainRain = <span class="st">&#39;The rain of spain falls mainly in the plain.&#39;</span>;
+<span class="co">//: undefined</span>
+<span class="ot">spainRain</span>.<span class="fu">indexOf</span>(<span class="st">&#39;ain&#39;</span>);
+<span class="co">//: 5</span>
+<span class="ot">spainRain</span>.<span class="fu">indexOf</span>(<span class="st">&#39;ain&#39;</span>, <span class="dv">0</span>);
+<span class="co">//: 5</span>
+<span class="ot">spainRain</span>.<span class="fu">indexOf</span>(<span class="st">&#39;ain&#39;</span>, <span class="dv">13</span>);
+<span class="co">//: 14</span>
+<span class="ot">spainRain</span>.<span class="fu">indexOf</span>(<span class="st">&#39;Audrey Hepburn&#39;</span>);
+<span class="co">//: -1</span></code></pre></li>
+</ul></li>
+<li>'The r<em>ain</em> of sp<em>ain</em> falls mainly in the plain.'</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="some-methods-on-string-2">Some methods on String</h3>
+<ul>
+<li><em>string</em>.slice(<em>start</em>, <em>[end]</em>): capture substring from <em>start</em> to <em>end</em>
+<ul>
+<li><em>start</em>: the start position of the string for substring, could be negative (count backward from the end.)</li>
+<li><p><em>end</em>: the end position of the string for substring, could be negative. Defaults to the length of String.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> fixYou = <span class="st">&#39;Lights will guide you home, and ignite your bones&#39;</span>;
+<span class="co">//: undefined</span>
+<span class="ot">fixYou</span>.<span class="fu">slice</span>(<span class="dv">22</span>, <span class="dv">26</span>);
+<span class="co">//: &quot;home&quot;</span>
+<span class="ot">fixYou</span>.<span class="fu">slice</span>(-<span class="dv">5</span>);
+<span class="co">//: &quot;bones&quot;</span></code></pre></li>
+</ul></li>
+<li><em>string</em>.substring: do not use it since it doesn't support backward counting, <em>slice</em> is superior.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="some-methods-on-string-3">Some methods on String</h3>
+<ul>
+<li><em>string</em>.split(<em>delimeter</em>, <em>[limit]</em>): divide a string to an array by its delimeter
+<ul>
+<li><p><em>limit</em>: the limit to divided, at most.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> induction = <span class="st">&#39;To Iterate Is Human, To Recurse Divine&#39;</span>;
+<span class="co">//: undefined</span>
+<span class="ot">induction</span>.<span class="fu">split</span>(<span class="st">&#39;To&#39;</span>);
+<span class="co">//: Array [ &quot;&quot;, &quot; Iterate Is Human, &quot;, &quot; Recurse Divine&quot; ]</span>
+<span class="ot">induction</span>.<span class="fu">split</span>(<span class="st">&#39;To&#39;</span>, <span class="dv">2</span>);
+<span class="co">//: Array [ &quot;&quot;, &quot; Iterate Is Human&quot; ]</span></code></pre></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="string-is-immutable">String is immutable</h3>
+<ul>
+<li><p>It cannnot be altered by <em>string</em>[index].</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> scientist = <span class="st">&#39;Nobody said it was easy, it is such a shame for us to part&#39;</span>;
+<span class="co">//: undefined</span>
+scientist[<span class="dv">0</span>] = <span class="st">&#39;n&#39;</span>;
+<span class="co">//: &quot;n&quot;</span>
+scientist;
+<span class="co">//: &quot;Nobody said it was easy, it is such a shame for us to part&quot;</span>
+scientist[<span class="dv">2002</span>];
+<span class="co">//: undefined</span></code></pre></li>
+<li>We prefer <em>string</em>.charAt to <em>string</em>[index], since we do not want to deal with <code>undefined</code></li>
+<li>Usually we generate new string and assign new string to variable.</li>
+<li><p><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String#String_instances">More string opeartions goes there......</a></p></li>
+</ul>
+</section><section class="slide level2">
+
+<p>&quot;Complicated string operation?&quot;</p>
+</section><section class="slide level2">
+
+<figure>
+<img src="assets/regex.png" alt="Regular expression comes to rescue!" /><figcaption>Regular expression comes to rescue!</figcaption>
+</figure>
+</section><section class="slide level2">
+
+<h3 id="regular-expression">Regular Expression</h3>
+<ul>
+<li>Extremely useful on strings operations.</li>
+<li><p>Due to its learning curve, we can't cover here but give you a glimpse today:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> isValidId = <span class="ot">/</span><span class="fl">^</span><span class="bn">[A-Z]</span><span class="fl">{1}</span><span class="bn">[1-2]</span><span class="fl">{1}</span><span class="bn">[0-9]</span><span class="fl">{8}$</span><span class="ot">/</span>;
+<span class="co">//: undefined</span>
+<span class="ot">isValidId</span>.<span class="fu">test</span>(<span class="st">&#39;E271538163&#39;</span>);
+<span class="co">//: true</span></code></pre></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions">Learning source</a></li>
+<li><p><a href="https://regex101.com/">Online test tool</a></p></li>
+</ul>
+</section></section>
+<section><section id="control-structure" class="titleslide slide level1"><h1>Control Structure</h1></section><section class="slide level2">
+
+<h3 id="prime-number-test">Prime Number Test</h3>
+<ul>
+<li>We can determine whether a number is prime number or not by:
+<ol type="1">
+<li>for a number <span class="math">\(x\)</span>, compute <span class="math">\(\sqrt{x}\)</span></li>
+<li>we check all prime numbers <span class="math">\(&lt; \sqrt{x}\)</span> one by one, if none of them is a factor of <span class="math">\(x\)</span>, <span class="math">\(x\)</span> is a prime number.</li>
+</ol></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="prime-number-test-1">Prime Number Test</h3>
+<ul>
+<li>We can determine whether a number is prime number or not by:
+<ol type="1">
+<li>for a number <span class="math">\(x\)</span>, compute <span class="math">\(\sqrt{x}\)</span></li>
+<li>we check all prime numbers <span class="math">\(\leq \sqrt{x}\)</span> <strong>one by one (Iteration, Loop)</strong>, <strong>if (Condition)</strong> none of them is a factor of <span class="math">\(x\)</span>, <span class="math">\(x\)</span> is a prime number.</li>
+</ol></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="another-example">Another Example</h3>
+<ul>
+<li>Abs:
+<ol type="1">
+<li>For two numbers <span class="math">\(a, b\)</span>, compute <span class="math">\((a - b)\)</span></li>
+<li><strong>If (Condition)</strong> <span class="math">\((a - b) \geq 0\)</span>, <em>abs</em> is <span class="math">\((a - b)\)</span>, <strong>else (Condition)</strong>, <em>abs</em> is <span class="math">\((a - b) \times (-1)\)</span></li>
+</ol></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="control-structure-1">Control Structure</h3>
+<ul>
+<li>The examples we've seen above can be described as program running step by step, the same as (imperative) programming languages.</li>
+<li>The program block: a pieces of codes meant to be executed as a unit.</li>
+<li>To control program's behaviour, it can be generalised as:
+<ul>
+<li>Condition: The program block is executed based on the certain condition is satisfied.</li>
+<li>Iteration: The program block executes repeatedly based on the certain condition is satisfied.</li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="if-else-if...else"><em>if</em> (<em>else if</em>...<em>else</em>)</h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> a = <span class="dv">9</span>;
+<span class="kw">var</span> b = <span class="dv">81</span>;
+<span class="kw">var</span> abs;
+
+abs = a - b; <span class="co">// Compute (a - b)</span>
+
+<span class="kw">if</span> ( abs &gt;= <span class="dv">0</span>) { <span class="co">// If (a - b) &gt;= 0, abs is (a - b)</span>
+  abs = abs;
+} <span class="kw">else</span> <span class="kw">if</span> ( abs &lt; <span class="dv">0</span>) { <span class="co">// If (a - b) &lt; 0, abs is (a - b)*(-1)</span>
+  abs = abs * -<span class="dv">1</span>;
+}
+abs;
+<span class="co">//: 72</span></code></pre>
+<p>What <em>abs</em> will be if a = 1812 and b = 1984?</p>
+</section><section class="slide level2">
+
+<h3 id="if-else-if...else-1"><em>if</em> (<em>else if</em>...<em>else</em>)</h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">if</span> (BOOLEAN_EXPRESSION_1) {
+  PROGRAM_BLOCK_1;
+} <span class="kw">else</span> <span class="kw">if</span> (BOOLEAN_EXPRESSION_2) {
+  PROGRAM_BLOCK_2;
+} <span class="kw">else</span> {
+  PROGRAM_BLOCK_3;
+}</code></pre>
+<ul>
+<li>The program check if:
+<ol type="1">
+<li>BOOLEAN_EXPRESSION_1 is evaluated as <code>True</code>, then PROGRAM_BLOCK_1 is executed, <strong>else if</strong></li>
+<li>BOOLEAN_EXPRESSION_2 is evaluated as <code>True</code>, then PROGRAM_BLOCK_2 is executed. <strong>else</strong></li>
+<li>if the above checks failed, PROGRAM_BLOCK_3 is executed.</li>
+</ol></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>In JavaScript, <em>else if</em> / <em>else</em> is optional.</li>
+<li><em>if</em> statement can be contained in another <em>if</em> statement.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="if-else-if..else"><em>if</em> (<em>else if</em>..<em>else</em>)</h3>
+<p>Back to <em>abs</em> program, we see:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> a = <span class="dv">9</span>;
+<span class="kw">var</span> b = <span class="dv">81</span>;
+<span class="kw">var</span> abs;
+
+abs = a - b; <span class="co">// Compute (a - b)</span>
+
+<span class="kw">if</span> ( abs &gt;= <span class="dv">0</span>) { <span class="co">// If (a - b) &gt;= 0, abs is (a - b)</span>
+  abs = abs;
+} <span class="kw">else</span> <span class="kw">if</span> ( abs &lt; <span class="dv">0</span>) { <span class="co">// If (a - b) &lt; 0, abs is (a - b)*(-1)</span>
+  abs = abs * -<span class="dv">1</span>;
+}
+abs;
+<span class="co">//: 72</span></code></pre>
+<ol type="1">
+<li><code>abs = abs</code> is unnecessary (have no effects on program), <em>if</em> block can be omitted.</li>
+<li><em>else if</em> part then will be <em>if</em> part.</li>
+</ol>
+</section><section class="slide level2">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> a = <span class="dv">9</span>;
+<span class="kw">var</span> b = <span class="dv">81</span>;
+<span class="kw">var</span> abs;
+
+abs = a - b; <span class="co">// Compute (a - b) as abs</span>
+
+<span class="kw">if</span> ( abs &lt; <span class="dv">0</span>) { <span class="co">// If (a - b) &lt; 0, abs is (a - b)*(-1)</span>
+  abs = abs * -<span class="dv">1</span>;
+}
+abs;
+<span class="co">//: 72</span></code></pre>
+<p>The program is cleaner, and the logic is the same.</p>
+</section><section class="slide level2">
+
+<h3 id="while"><em>while</em></h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// Russian roulette program</span>
+<span class="kw">var</span> bullet = <span class="dv">3</span>;
+<span class="kw">var</span> times = <span class="dv">1</span>;
+<span class="kw">var</span> rotate;
+<span class="kw">var</span> isDead = <span class="kw">false</span>;
+
+<span class="kw">while</span> (times !== <span class="dv">10</span>) {
+  rotate = <span class="ot">Math</span>.<span class="fu">floor</span>( <span class="ot">Math</span>.<span class="fu">random</span>() * ( <span class="dv">1</span> + <span class="dv">6</span> - <span class="dv">1</span> ) ) + <span class="dv">1</span>;
+  <span class="co">// For now, you only need to know RHS produces random number from 1 to 6.</span>
+  <span class="kw">if</span> (rotate === bullet) {
+    isDead = <span class="kw">true</span>;
+    <span class="kw">break</span>;
+  }
+  times = times + <span class="dv">1</span>;
+}
+
+isDead;
+<span class="co">//: Nah, it&#39;s either true or false, but I can&#39;t tell you.</span>
+times;
+<span class="co">//: Nah, I can&#39;t tell you either, but it can tell you when you&#39;re dead (or live, if you went through the final round).</span></code></pre>
+</section><section class="slide level2">
+
+<h3 id="while-1"><em>while</em></h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">while</span> (BOOLEAN_EXPRESSION) {
+  PROGRAM_BLOCK;
+}</code></pre>
+<ul>
+<li>Entry: When the program is about to enter the loop, it evaluates BOOLEAN_EXPRESSION. If it turns out to be <code>true</code>, the program goes into PROGRAM_BLOCK, or just skip.</li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>Loop: When PROGRAM_BLOCK is executed, it evaluates BOOLEAN_EXPRESSION again. If it turns out to be <code>true</code>, the program goes into PROGRAM_BLOCK again, or just skip.</li>
+<li><p>Termination: The loop terminates when BOOLEAN_EXPRESSION is evaluated as <code>false</code>.</p></li>
+<li><code>break</code>, <code>continue</code>:
+<ul>
+<li><code>break</code>: jumps out of loop no matter what.</li>
+<li><code>continue</code>: go through the next iteration.</li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="while-2"><em>while</em></h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// Russian roulette program</span>
+<span class="kw">var</span> bullet = <span class="dv">3</span>;
+<span class="kw">var</span> times = <span class="dv">1</span>;
+<span class="kw">var</span> rotate;
+<span class="kw">var</span> isDead = <span class="kw">false</span>;
+
+<span class="kw">while</span> (times !== <span class="dv">10</span>) {
+  rotate = <span class="ot">Math</span>.<span class="fu">floor</span>( <span class="ot">Math</span>.<span class="fu">random</span>() * ( <span class="dv">1</span> + <span class="dv">6</span> - <span class="dv">1</span> ) ) + <span class="dv">1</span>;
+  <span class="co">// For now, you only need to know RHS produces random number from 1 to 6.</span>
+  <span class="kw">if</span> (rotate === bullet) {
+    isDead = <span class="kw">true</span>;
+    <span class="kw">break</span>;
+  }
+  times = times + <span class="dv">1</span>;
+}
+
+isDead;
+<span class="co">//: Nah, it&#39;s either true or false, but I can&#39;t tell you.</span>
+times;
+<span class="co">//: Nah, I can&#39;t tell you either, but it can tell you when you&#39;re dead.</span></code></pre>
+</section><section class="slide level2">
+
+<ul>
+<li><code>times !== 10</code>: Boolean Expression.</li>
+<li><code>break</code>: jumps out of loop since you're dead already.</li>
+<li><code>times = times + 1</code>: It guarantees that your program terminates at last.</li>
+<li>How many rounds the player has to play if he / she is lucky enough to stay alive?</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="exercises-for-while">Exercises for <em>while</em></h3>
+<ul>
+<li>Refine <em>Russian roulette program</em> by introducing <code>player</code> variable. <code>player</code> can be either <code>1</code> or <code>2</code>. The program shall show that it indicates a death duel (Program stops when either player 1 or player 2 winds up dead.)</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="for"><em>for</em></h3>
+<p>Recall <em>while</em> loop in Russian roulette program:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> times = <span class="dv">1</span>;
+...
+<span class="kw">while</span> (times !== <span class="dv">10</span>) {
+  ...
+  times = times + <span class="dv">1</span>;
+}</code></pre>
+<p>The pattern is so common that it leads to the birth of <em>for</em>:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">for</span> (<span class="kw">var</span> times = <span class="dv">1</span>; times !== <span class="dv">10</span>; times = times + <span class="dv">1</span>) {
+  ...
+}</code></pre>
+</section><section class="slide level2">
+
+<h3 id="for-1"><em>for</em></h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">for</span> (INITIALISER; CONDITION; ITERATOR) {
+  PROGRAM_BLOCK;
+}</code></pre>
+<p>can be expanded to:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">INITIALISER;
+<span class="kw">while</span> (CONDITION) {
+  PROGRAM_BLOCK;
+  ITERATOR;
+}</code></pre>
+</section><section class="slide level2">
+
+<h3 id="for-2"><em>for</em></h3>
+<p>Recall prime test problem.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> n = <span class="dv">8849</span>;
+<span class="kw">var</span> sqrtOfN = <span class="ot">Math</span>.<span class="fu">sqrt</span>(n);
+<span class="kw">var</span> isPrime = <span class="kw">true</span>;
+
+<span class="kw">for</span> (<span class="kw">var</span> i = <span class="dv">2</span>; i &lt; sqrtOfN; i = i + <span class="dv">1</span>) {
+  <span class="kw">if</span> (n % i === <span class="dv">0</span>) {
+    isPrime = <span class="kw">false</span>;
+    <span class="kw">break</span>;
+  }
+}
+
+isPrime;
+<span class="co">//: true</span></code></pre>
+</section><section class="slide level2">
+
+<ul>
+<li>Notice <em>i</em> starts from 2.
+<ul>
+<li><em>n % 0</em> produces <code>NaN</code></li>
+</ul></li>
+<li>Wait, you said we only need to check the primes <span class="math">\(\leq \sqrt{x}\)</span>!
+<ul>
+<li>However, checking all numbers includes checking those are prime. (weaker)</li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="exercises-for-for">Exercises for <em>for</em></h3>
+<ul>
+<li>Calculate the sum of 1 to 1000, using <em>for</em>.</li>
+<li>Explain why <span class="math">\(\frac{(1 + n)n}{2}\)</span> is superior.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="exercises-1">Exercises</h3>
+<ul>
+<li>Collatz conjecture: for any natural number <span class="math">\(n &gt; 1\)</span>, if:
+<ul>
+<li><span class="math">\(n\)</span> is odd: verify <span class="math">\(3n + 1\)</span></li>
+<li><span class="math">\(n\)</span> is even: verify <span class="math">\(\frac{n}{2}\)</span></li>
+</ul></li>
+<li>recursively, and <span class="math">\(n\)</span> ends up with <em>1</em>. <a href="http://en.wikipedia.org/wiki/Collatz_conjecture">reference</a></li>
+<li>Using <em>while</em>, and <em>for</em> to verify Collatz conjecture holds for 1 - 10000;</li>
+</ul>
+</section></section>
+<section><section id="function" class="titleslide slide level1"><h1>Function</h1></section><section class="slide level2">
+
+<h3 id="prime-test-again">Prime Test (again?)</h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> n = <span class="dv">8849</span>;
+<span class="kw">var</span> sqrtOfN = <span class="ot">Math</span>.<span class="fu">sqrt</span>(n);
+<span class="kw">var</span> isPrime = <span class="kw">true</span>;
+
+<span class="kw">for</span> (<span class="kw">var</span> i = <span class="dv">2</span>; i &lt; sqrtOfN; i = i + <span class="dv">1</span>) {
+  <span class="kw">if</span> (n % i === <span class="dv">0</span>) {
+    isPrime = <span class="kw">false</span>;
+    <span class="kw">break</span>;
+  }
+}
+
+isPrime;
+<span class="co">//: true</span></code></pre>
+<p>What if we want to check whether <em>15919</em> is a prime number?</p>
+</section><section class="slide level2">
+
+<p>Easy, just copy &amp; paste and change <em>n</em>:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> n = <span class="dv">15919</span>;
+<span class="kw">var</span> sqrtOfN = <span class="ot">Math</span>.<span class="fu">sqrt</span>(n);
+<span class="kw">var</span> isPrime = <span class="kw">true</span>;
+
+<span class="kw">for</span> (<span class="kw">var</span> i = <span class="dv">2</span>; i &lt; sqrtOfN; i = i + <span class="dv">1</span>) {
+  <span class="kw">if</span> (n % i === <span class="dv">0</span>) {
+    isPrime = <span class="kw">false</span>;
+    <span class="kw">break</span>;
+  }
+}
+
+isPrime;
+<span class="co">//: true</span></code></pre>
+</section><section class="slide level2">
+
+<p>Okay, what about <em>15791 15797 15803 15809 15817 15823 15859 15877 15881 15887 15889 15901 15907 15913 15919 15923 15937 15959 15971 15973 15991 16001 16007 16033 16057 16061 16063 16067 16069 16073</em> ....... <img src="assets/rage_face_fff.jpg" /></p>
+</section><section class="slide level2">
+
+<ul>
+<li>As you can see, these codes is basically the same, except for <em>n</em>.</li>
+<li>We can refine the code by parameterisation and make it a subprogram.</li>
+</ul>
+</section><section class="slide level2">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> isPrime = <span class="kw">function</span> (n) {
+  <span class="kw">var</span> sqrtOfN = <span class="ot">Math</span>.<span class="fu">sqrt</span>(n);
+  <span class="kw">var</span> isPrime = <span class="kw">true</span>;
+
+  <span class="kw">for</span> (<span class="kw">var</span> i = <span class="dv">2</span>; i &lt; sqrtOfN; i = i + <span class="dv">1</span>) {
+    <span class="kw">if</span> (n % i === <span class="dv">0</span>) {
+      isPrime = <span class="kw">false</span>;
+      <span class="kw">return</span> isPrime;
+    }
+  }
+  <span class="kw">return</span> isPrime;
+};
+<span class="co">//: undefined</span>
+<span class="fu">isPrime</span>(<span class="dv">15907</span>);
+<span class="co">//: true</span></code></pre>
+</section><section class="slide level2">
+
+<ul>
+<li>Here, we take <em>n</em> as the parameter of the function.</li>
+<li>It <strong>return</strong> values either true or false;</li>
+<li>Note you can totally discard <em>isPrime</em> by simply return <em>true</em> or <em>false</em>.
+<ul>
+<li>Ugh, you got two <em>isPrime</em>, which ones you're talking about?</li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="function-1">Function</h3>
+<ul>
+<li>Definition
+<ul>
+<li>Function as subprogram</li>
+<li>Function as mapping from domain to range (mathematical definition)</li>
+</ul></li>
+<li>However, in JavaScript, the border of definitions become blurred.</li>
+<li>In JavaScript, function can be seen having two phases:
+<ol type="1">
+<li>Definition: define the function body, assign it to a variable.</li>
+<li>Invocation / Application: execute the function body by giving the parameters to function variable.</li>
+</ol></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="how-to-define-a-function">How to define a function</h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> FUNCTION_NAME;
+FUNCTION_NAME = <span class="kw">function</span> (p1, p2, <span class="ot">p3</span>.....) {
+  PROGRAM_BLOCK;
+};</code></pre>
+<ul>
+<li>The function body which takes <em>p1, p2, p3...</em> as parameters and executes PROGRAM_BLOCK, is assigned to FUNCTION_NAME.</li>
+<li><p>You might see the following as well, but it didn't give a sense of <em>function as data</em>.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">function</span> <span class="fu">FUNCTION_NAME</span> (p1, p2, <span class="ot">p3</span>......) {
+  PROGRAM_BLOCK;
+}</code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="how-to-apply-function">How to apply function</h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="fu">FUNCTION_NAME</span>(p1, p2, <span class="ot">p3</span>......);
+<span class="co">//: return value or undefined.</span></code></pre>
+<ul>
+<li>Simply supply parameters to function.</li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><p>PROGRAM_BLOCK may contain <code>return</code> keyword, which takes one value as the result of the function. If it's not given, function will return <code>undefined</code> instead.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> sumOf = <span class="kw">function</span> (n) {
+  <span class="kw">var</span> sum = ( <span class="dv">1</span> + n ) * n / <span class="dv">2</span>;
+  <span class="kw">return</span> sum;
+};
+<span class="co">//: undefined;</span>
+<span class="fu">sumOf</span>(<span class="dv">1000</span>);
+<span class="co">//: 500500</span>
+<span class="kw">var</span> sumOf2 = <span class="kw">function</span> (n) {
+  <span class="kw">var</span> sum = ( <span class="dv">1</span> + n ) * n / <span class="dv">2</span>;
+};
+<span class="co">//: undefined</span>
+<span class="fu">sumOf2</span>(<span class="dv">1000</span>);
+<span class="co">//: undefined</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="when-to-define-a-function">When to define a function</h3>
+<ol type="1">
+<li>You discover duplicate code and common pattern, and you need to abstract it.
+<ul>
+<li>We've seen it before.</li>
+</ul></li>
+<li><p>You discover the mathematical relation of input and output.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> fibonacci = <span class="kw">function</span> (x) {
+  <span class="kw">if</span> (x === <span class="dv">1</span> || x === <span class="dv">2</span>) {
+    <span class="kw">return</span> <span class="dv">1</span>;
+  } <span class="kw">else</span> <span class="kw">if</span> (x &gt; <span class="dv">2</span>) {
+    <span class="kw">return</span> <span class="fu">fibonacci</span>(x - <span class="dv">1</span>) + <span class="fu">fibonacci</span>(x - <span class="dv">2</span>);
+  }
+};</code></pre></li>
+</ol>
+<ul>
+<li>It just a plain translation from the definition of Fibonacci number.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="parameter">Parameter</h3>
+<ul>
+<li>JavaScript functions do not check the number of arguments received.
+<ul>
+<li>If you supply more arguments than those you define, the remaining will be omitted.</li>
+<li><p>If you supply less, the rest will be set as <code>undefined</code>.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> fn = <span class="kw">function</span> (a, b, c) {
+  <span class="kw">return</span> a * b * c;
+};
+<span class="fu">fn</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>);
+<span class="co">//: 6</span>
+<span class="fu">fn</span>(<span class="dv">1</span>, <span class="dv">2</span>);
+<span class="co">//: NaN (any number multiplies undefined equals to NaN)</span>
+<span class="fu">fn</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">9</span>);
+<span class="co">//: 6</span></code></pre></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="default-values">Default Values</h3>
+<ul>
+<li><p>JavaScript doesn't support default values of parameters by default, but it can be addressed via:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> fn = <span class="kw">function</span> (a, b) {
+  a = a || <span class="dv">3</span>;
+  b = b || <span class="dv">7</span>;
+  <span class="kw">return</span> a * b;
+};
+<span class="fu">fn</span>();
+<span class="co">//: 21</span>
+<span class="fu">fn</span>(<span class="dv">9</span>);
+<span class="co">//: 63</span></code></pre></li>
+<li><p>JavaScript evaluates boolean expression in the form of <code>true || (anything)</code>. In this case, if <code>a</code> is <code>undefined</code>, if evaluates as <code>3</code>;</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="anonymous-function-lambda">Anonymous Function (<span class="math">\(\lambda\)</span>)</h3>
+<ul>
+<li>Recall when we define a function, we define the function body first and assign it to a variable later.</li>
+<li>Instead of assigning it to a variable, the function body can be used directly, it's called <code>anonymous function</code> in such context.</li>
+<li><p>For example, execute function right after the definition:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">(<span class="kw">function</span> (a, b) {
+  <span class="kw">return</span> a * b;
+})(<span class="dv">7</span>, <span class="dv">6</span>);
+<span class="co">//: 42 </span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="function-as-data">Function as Data</h3>
+<ul>
+<li>In JavaScript, you can pass function as data to other function, return function out of function.</li>
+<li>You can construct your logical components in the unit of functions, and junction them together.</li>
+<li><strong>It's quite common pattern in JavaScript: using function as function callback.</strong></li>
+</ul>
+</section><section class="slide level2">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> repeat = <span class="kw">function</span> (f, times) {
+  <span class="kw">return</span> <span class="kw">function</span> (n) {
+    <span class="kw">var</span> v = n;
+    <span class="kw">for</span> (<span class="kw">var</span> i = <span class="dv">0</span>; i &lt; times; i = i + <span class="dv">1</span>) {
+      v = <span class="fu">f</span>(v);
+    }
+    <span class="kw">return</span> v;  
+  };
+};
+<span class="co">//: undefined</span>
+<span class="kw">var</span> square = <span class="kw">function</span> (n) {
+  <span class="kw">return</span> n * n;
+};
+<span class="co">//: undefined</span>
+<span class="kw">var</span> quad = <span class="fu">repeat</span>(square, <span class="dv">2</span>);
+<span class="co">//: undefined</span>
+<span class="fu">quad</span>(<span class="dv">3</span>);
+<span class="co">//: 81</span></code></pre>
+<ul>
+<li>We use <em>square</em> function to make a new function <em>quad</em> which is: <span class="math">\(quad(x) = square(square(x))\)</span></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="scope">Scope</h3>
+<ul>
+<li>In JavaScript, when you invoke a function, you create a local scope.</li>
+<li>When you access a variable in a function, it first lookups the variables in the scope (parameters, local variables), if it didn't find a one, it lookups outside the functions. (Bubble up)</li>
+</ul>
+</section><section class="slide level2">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> isPrime = <span class="kw">function</span> (n) {
+  <span class="kw">var</span> sqrtOfN = <span class="ot">Math</span>.<span class="fu">sqrt</span>(n);
+  <span class="kw">var</span> isPrime = <span class="kw">true</span>;
+
+  <span class="kw">for</span> (<span class="kw">var</span> i = <span class="dv">2</span>; i &lt; sqrtOfN; i = i + <span class="dv">1</span>) {
+    <span class="kw">if</span> (n % i === <span class="dv">0</span>) {
+      isPrime = <span class="kw">false</span>;
+      <span class="kw">return</span> isPrime;
+    }
+  }
+  <span class="kw">return</span> isPrime;
+};</code></pre>
+<ul>
+<li>Due to the declaration of <code>isPrime</code> in the function, all <code>isPrime</code> occurs in the function act as a concrete variable different from the function name.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="hosting">Hosting</h3>
+<ul>
+<li><p>Consider the program:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> x = <span class="dv">10</span>;
+<span class="kw">var</span> fn = <span class="kw">function</span> () {
+  <span class="kw">return</span> x;
+  <span class="kw">var</span> x = <span class="dv">100</span>;
+};
+<span class="fu">fn</span>();
+<span class="co">//: ?</span></code></pre></li>
+<li><p><code>fn()</code> will be 10? or 100?</p></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><code>undefined</code> actually, but why?</li>
+<li><p>The code actually looks like this:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> x = <span class="dv">10</span>;
+<span class="kw">var</span> fn = <span class="kw">function</span> () {
+  <span class="kw">var</span> x; <span class="co">// x is undefined then.</span>
+  <span class="kw">return</span> x;
+  x = <span class="dv">100</span>;
+};
+<span class="fu">fn</span>();
+<span class="co">//: undefined</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>When you invoke a function, the interpreter scans through your function body and define the variables you declare first (not assigned, yet.) and then it executes line by line.</li>
+<li>So, in reality, it's a good practice to define your variables at top, then your program logic.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="closure">Closure</h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> x = <span class="dv">10</span>;
+<span class="kw">var</span> fn = <span class="kw">function</span> (n) {
+  <span class="kw">return</span> n * x;
+};
+<span class="fu">fn</span>(<span class="dv">10</span>);
+<span class="co">//: 100</span>
+n;
+<span class="co">//: undefined</span>
+x = <span class="dv">1000</span>;
+<span class="fu">fn</span>(<span class="dv">10</span>);
+<span class="co">//: 10000</span></code></pre>
+<ul>
+<li>Functions that refer to independent (free) variables. In other words, the function defined in the closure 'remembers' the environment in which it was created.
+<ul>
+<li>Since <code>fn</code> has access to REPL, <code>fn</code>'s behaviour is dependent on REPL. (if REPL will be modified later)</li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="by-value-vs-by-reference">By-Value vs By-Reference</h3>
+<ul>
+<li>When we talk about variable as parameters of the function:
+<ul>
+<li>By-value: the program will make a copy of variable and operate on the copy.</li>
+<li>By-Reference: the program will operate directly on the variable.</li>
+</ul></li>
+<li>In JavaScript, variables which have primitive type (boolean, number, string) goes by-value, and those with composite types (object, array..) go by-reference.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="by-value">By-Value:</h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> fn = <span class="kw">function</span> (x) {
+  x = <span class="dv">1000</span>;
+  <span class="kw">return</span> x;
+};
+<span class="co">//: undefined</span>
+<span class="kw">var</span> n = <span class="dv">10</span>;
+<span class="co">//: undefined</span>
+<span class="fu">fn</span>(n);
+<span class="co">//: 1000</span>
+n;
+<span class="co">//: 10</span></code></pre>
+</section><section class="slide level2">
+
+<h3 id="by-reference">By-Reference:</h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> fn = <span class="kw">function</span> (x) {
+  <span class="ot">x</span>.<span class="fu">push</span>(<span class="dv">0</span>);
+  <span class="kw">return</span> x;
+};
+<span class="co">//: undefined</span>
+<span class="kw">var</span> c = [];
+<span class="co">//: undefined</span>
+<span class="fu">fn</span>(c);
+<span class="co">//: [0]</span>
+c;
+<span class="co">//: [0]</span></code></pre>
+</section><section class="slide level2">
+
+<h3 id="exercises-2">Exercises</h3>
+<ul>
+<li>Recall <em>abs</em> program, choose proper parameters and make it a function.</li>
+<li><p>Design a function <em>fn</em> which gets off work: Write a function which takes a function <em>f</em> and produces another function which only works between 9 AM - 5 PM. Your code might work like this:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> square = <span class="fu">fn</span>(<span class="kw">function</span> (e) {
+  <span class="kw">return</span> e*e;
+});
+<span class="fu">square</span>(<span class="dv">2</span>); <span class="co">// It&#39;s 8:50 now</span>
+<span class="co">//: &quot;I&#39;m off work now, leave me alone!&quot;</span>
+<span class="fu">square</span>(<span class="dv">2</span>); <span class="co">// It&#39;s 9:01 now</span>
+<span class="co">//: 4</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><p>To do so, you need to know the current time:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> currentDate = <span class="kw">new</span> <span class="fu">Date</span>();
+<span class="kw">var</span> currentHour = <span class="ot">currentDate</span>.<span class="fu">getHours</span>();
+currentHour;
+<span class="co">//: 0 (it varies)</span></code></pre></li>
+<li>It's actually a quite common pattern in functional programming, to compose new functions by mixing them together.
+<ul>
+<li>We'll introduce the concept of object later.</li>
+</ul></li>
+</ul>
+</section></section>
+<section><section id="array" class="titleslide slide level1"><h1>Array</h1></section><section class="slide level2">
+
+<h3 id="what-does-an-array-look-like">What does an array look like?</h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> primes = [<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">11</span>,<span class="dv">13</span>,<span class="dv">17</span>,<span class="dv">19</span>];
+<span class="co">//: undefined</span>
+primes
+<span class="co">//: [2,3,5,7,11,13,17,19];</span>
+primes[<span class="dv">3</span>];
+<span class="co">//: 7</span>
+primes[<span class="dv">89</span>];
+<span class="co">//: undefined</span></code></pre>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Index</th>
+<th style="text-align: left;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">...</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</section><section class="slide level2">
+
+<h3 id="array-1">Array</h3>
+<ul>
+<li><strong>Like list.</strong>
+<ul>
+<li>Used to represent sequential data.</li>
+</ul></li>
+<li>Neither the length nor the types of an array are fixed.
+<ul>
+<li>However, keep it the same type helps design / use algorithm.</li>
+</ul></li>
+<li><p>Access its value by <strong>a given index</strong>, <strong>where the index starts from 0.</strong></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">primes[<span class="dv">2</span>];
+<span class="co">//: 5</span></code></pre>
+<p>where <em>2</em> is the index, and <em>5</em> is the value.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="construct-array">Construct Array</h3>
+<ul>
+<li>Either by array literal or <em>array</em>.push method:</li>
+</ul>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> primes = [<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">11</span>,<span class="dv">13</span>,<span class="dv">17</span>,<span class="dv">19</span>]; <span class="co">// array literal</span>
+<span class="co">//: undefined</span>
+
+<span class="kw">var</span> primes = []; <span class="co">// define a empty array</span>
+<span class="co">//: undefined</span>
+<span class="ot">primes</span>.<span class="fu">push</span>(<span class="dv">2</span>);
+<span class="co">//: 1</span>
+<span class="ot">primes</span>.<span class="fu">push</span>(<span class="dv">3</span>);
+<span class="co">//: 2</span></code></pre>
+</section><section class="slide level2">
+
+<h3 id="add-element-to-an-array">Add element to an array</h3>
+<ul>
+<li><p>The index increases incrementally when new element is added.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="ot">primes</span>.<span class="fu">push</span>(<span class="dv">23</span>);
+<span class="co">//: 9</span>
+primes[<span class="dv">8</span>];
+<span class="co">//: 23</span></code></pre></li>
+<li><em>array</em>.push method return the length of the new-added array.</li>
+<li><p>Some use <code>primes[primes.length] = 23</code>, which returns the value.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="remove-element-from-an-array">Remove element from an array</h3>
+<ul>
+<li>Either by <em>array</em>.pop or <em>array</em>.splice method:
+<ul>
+<li><em>array</em>.pop(): remove the last item and return it.</li>
+<li><p><em>array</em>.splice(s, c, [items]): remove <em>c</em> items from <em>s</em>, added <em>items</em> if supplied. (return the deleted part.)</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> primes = [<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">11</span>,<span class="dv">13</span>,<span class="dv">17</span>,<span class="dv">19</span>];
+<span class="co">//: undefined</span>
+<span class="ot">primes</span>.<span class="fu">pop</span>();
+<span class="co">//: 19</span>
+primes;
+<span class="co">//: Array [ 2, 3, 5, 7, 11, 13, 17 ]</span>
+<span class="ot">primes</span>.<span class="fu">splice</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">0</span>);
+<span class="co">//: Array [ 3, 5 ] </span>
+primes;
+<span class="co">//: Array [ 2, 0, 0, 7, 11, 13, 17 ];</span></code></pre></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="lookup-modify-the-array">Lookup / Modify the array</h3>
+<ul>
+<li><p>Remark: we can access the value by a given index:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">primes[<span class="dv">3</span>];
+<span class="co">//: 7</span></code></pre></li>
+<li><p>To change its value, simply assign:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">primes[<span class="dv">3</span>] = <span class="dv">3</span>;
+<span class="co">//: 3;</span>
+primes[<span class="dv">3</span>];
+<span class="co">//: 3</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="some-properties-methods-on-array">Some properties / methods on Array</h3>
+<ul>
+<li><em>array</em>.length: <del>returns the length of the array.</del>
+<ul>
+<li><p>returns (the maximum index + 1) of the array</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> primes = [<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">11</span>,<span class="dv">13</span>,<span class="dv">17</span>,<span class="dv">19</span>];
+<span class="co">//: undefined</span>
+primes[<span class="dv">8849</span>] = <span class="dv">91529</span>;
+<span class="co">//: 91529</span>
+<span class="ot">primes</span>.<span class="fu">length</span>;
+<span class="co">//: 8850</span>
+primes;
+<span class="co">//: Array [ 2, 3, 5, 7, 11, 13, 17, 19, &lt;2 empty slots&gt;, 8840 more… ]</span></code></pre></li>
+<li><p>Stick to <em>array</em>.push or <em>arr</em>[<em>arr.length</em>]</p></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="some-properties-methods-on-array-1">Some properties / methods on Array</h3>
+<ul>
+<li><em>array</em>.slice(<em>start</em>, <em>[end]</em>): make a new array as sub-array from the original one
+<ul>
+<li><em>start</em>: the start position of the array for sub-array, could be negative (count backward from the end.)</li>
+<li><p><em>end</em>: the end position of the array for sub-array, could be negative. Defaults to the length of array.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> primes = [<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">11</span>,<span class="dv">13</span>,<span class="dv">17</span>,<span class="dv">19</span>];
+<span class="co">//: undefined</span>
+<span class="ot">primes</span>.<span class="fu">slice</span>(<span class="dv">3</span>, <span class="dv">7</span>);
+<span class="co">//: Array [ 7, 11, 13, 17 ]</span>
+primes;
+<span class="co">//: Array [ 2, 3, 5, 7, 11, 13, 17, 19 ]</span></code></pre></li>
+</ul></li>
+<li>Don't be confused with <em>array</em>.splice.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="sorting">Sorting</h3>
+<ul>
+<li><p>Consider the following program:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">[<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">11</span>,<span class="dv">13</span>,<span class="dv">17</span>,<span class="dv">19</span>].<span class="fu">sort</span>();
+<span class="co">//: Array [ 11, 13, 17, 19, 2, 3, 5, 7 ]</span></code></pre></li>
+<li>By default, the array sorts according to each character's Unicode value, converted to <em>String</em> first if not.</li>
+<li><p>To make use of <em>array</em>.sort function, we need to supply a comparison function.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="sorting-1">Sorting</h3>
+<ul>
+<li><p>The comparison function is supplied as parameter of sort function.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">[<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">11</span>,<span class="dv">13</span>,<span class="dv">17</span>,<span class="dv">19</span>].<span class="fu">sort</span>(<span class="kw">function</span> (a, b) {
+  <span class="kw">return</span> (a - b);
+});
+<span class="co">//: Array [ 2, 3, 5, 7, 11, 13, 17, 19 ]</span></code></pre></li>
+<li><em>a</em> and <em>b</em> denotes arbitrary items.</li>
+<li>The comparison function denotes the relations of two items by:
+<ul>
+<li><span class="math">\((a - b &lt; 0) \rightarrow (a &lt; b)\)</span></li>
+<li><span class="math">\((a - b = 0) \rightarrow (a = b)\)</span></li>
+<li><span class="math">\((a - b &gt; 0) \rightarrow (a &gt; b)\)</span></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>The sort method will swap if the return value is larger than 0.</li>
+<li><p>By default it sorts in ascending order. To sort in descending order, simply return <code>(b - a)</code></p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">[<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">11</span>,<span class="dv">13</span>,<span class="dv">17</span>,<span class="dv">19</span>].<span class="fu">sort</span>(<span class="kw">function</span> (a, b) {
+  <span class="kw">return</span> (b - a);
+});
+<span class="co">//: Array [ 19, 17, 13, 11, 7, 5, 3, 2 ]</span></code></pre></li>
+<li>How the relations are represented in the above function?</li>
+<li><p>How you would write a comparison function to make it keep the array the same? (unsorted)</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="exercises-3">Exercises</h3>
+<ul>
+<li>Selection Sort (ascending)
+<ul>
+<li>For one unsorted array: [6, 9, 7, 2, 3]</li>
+<li>Compare the first element (6 in the case) with the rest by each, swap them if the first is larger than any in the rest.
+<ul>
+<li>In the case, 6 will be swapped with 2. Since we knew <span class="math">\(6 &gt; 2\)</span>, and those compared with 6 <span class="math">\(&gt; 6\)</span>, we knew those compared with 6 <span class="math">\(&gt; 2\)</span> (Transitive relation)</li>
+</ul></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>Selection Sort (ascending)
+<ul>
+<li><strong>After one iteration, the first one is the smallest in the array.</strong> ([2, 9, 7, 6, 3])</li>
+<li>Start again from the second element (9 in the case), and the third..., to the end of the array.</li>
+</ul></li>
+<li>See <a href="https://www.youtube.com/watch?v=f8hXR_Hvybo">visualisation</a></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>Selection Sort with Comparison Function
+<ul>
+<li>Refine your sorting algorithm with one function parameter, known as comparison function, which is the same as <em>array</em>.sort</li>
+</ul></li>
+</ul>
+</section></section>
+<section><section id="object" class="titleslide slide level1"><h1>Object</h1></section><section class="slide level2">
+
+<h3 id="object-1">Object</h3>
+<ul>
+<li>An object is a collection of properties. Properties could be:
+<ul>
+<li>Primitive types: Number, String, Boolean</li>
+<li>Composite types: Object
+<ul>
+<li>Object could be: Function, Array</li>
+</ul></li>
+</ul></li>
+<li>Function in object is called <em>method</em>.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="whey-do-we-need-object-after-all">Whey do we need object, after all?</h3>
+</section><section class="slide level2">
+
+<ul>
+<li>To define a square in Cartesian coordinates system, we have two different ways:
+<ul>
+<li>Records four points such as (0, 0), (4, 0), (0, 4), (4, 4)</li>
+<li>Records the center point (2, 2) and the length of its sides (4)</li>
+</ul></li>
+<li>Diagonal is always larger than the side.</li>
+</ul>
+<figure>
+<img src="assets/square.png" alt="Two representaions of a square" /><figcaption>Two representaions of a square</figcaption>
+</figure>
+</section><section class="slide level2">
+
+<ul>
+<li><p>To calculate the area of the square, using the definition 1:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> p1x = <span class="dv">0</span>;
+<span class="kw">var</span> p1y = <span class="dv">0</span>;
+<span class="kw">var</span> p2x = <span class="dv">4</span>;
+<span class="kw">var</span> p2y = <span class="dv">0</span>;
+<span class="kw">var</span> p3x = <span class="dv">0</span>;
+<span class="kw">var</span> p3y = <span class="dv">4</span>;
+<span class="kw">var</span> p4x = <span class="dv">4</span>;
+<span class="kw">var</span> p4y = <span class="dv">4</span>;
+<span class="kw">var</span> distance = <span class="kw">function</span> (p1x, p1y, p2x, p2y) {
+  <span class="kw">return</span> <span class="ot">Math</span>.<span class="fu">sqrt</span>(<span class="ot">Math</span>.<span class="fu">pow</span>(p1x - p2x, <span class="dv">2</span>) + <span class="ot">Math</span>.<span class="fu">pow</span>(p1y - p2y, <span class="dv">2</span>));
+};
+<span class="kw">var</span> squareArea = <span class="kw">function</span> (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
+  <span class="kw">var</span> d1 = <span class="fu">distance</span>(p1x, p1y, p2x, p2y);
+  <span class="kw">var</span> d2 = <span class="fu">distance</span>(p1x, p1y, p3x, p3y);
+  <span class="kw">var</span> length = (d1 &lt;= d2) ? d1 : d2; <span class="co">// (d1, d2 might be only diagonal / side.)</span>
+  <span class="kw">return</span> length * length;
+};
+<span class="fu">squareArea</span>(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y);
+<span class="co">//: 16</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><p>One day, your lead programmer came and says: &quot;Hey, let's do that in def 2!&quot;</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> c1x = <span class="dv">2</span>;
+<span class="kw">var</span> c2y = <span class="dv">2</span>;
+<span class="kw">var</span> side = <span class="dv">4</span>;
+<span class="kw">var</span> squareArea = <span class="kw">function</span> (side) {
+  <span class="kw">return</span> side * side;
+};</code></pre></li>
+<li><p>The code is prettier, but every occurrence of old <code>squareArea</code> need to be modified, along with the coordinates of squares.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>Imagine <em>Find / Replace</em> for few hundred times... <img src="assets/rage.png" alt="What the f**k" /></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="lets-make-a-object-of-it">Let's make a object of it!</h3>
+<ul>
+<li>In fact, what we <strong>REALLY</strong> care about is the square, not its coordinates / sides.
+<ul>
+<li>We want to know the area of the <strong>square</strong>, right?</li>
+</ul></li>
+<li><p><a href="https://www.youtube.com/watch?v=T0spkrwl9Qk">Wouldn't it be nice</a> if we have something like:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> squareArea = <span class="kw">function</span> (square) {
+  ......
+};
+<span class="fu">squareArea</span>(square);
+<span class="co">//: 16</span></code></pre></li>
+<li><p>Let's refine our code then.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> square = {
+  <span class="dt">p1</span>: {
+    <span class="dt">x</span>: <span class="dv">0</span>,
+    <span class="dt">y</span>: <span class="dv">0</span>
+  },
+  <span class="dt">p2</span>: {
+    <span class="dt">x</span>: <span class="dv">4</span>,
+    <span class="dt">y</span>: <span class="dv">0</span>
+  },
+  <span class="dt">p3</span>: {
+    <span class="dt">x</span>: <span class="dv">0</span>,
+    <span class="dt">y</span>: <span class="dv">4</span>
+  },
+  <span class="dt">p4</span>: {
+    <span class="dt">x</span>: <span class="dv">4</span>,
+    <span class="dt">y</span>: <span class="dv">4</span>
+  }
+};</code></pre>
+</section><section class="slide level2">
+
+<ul>
+<li><p>(Cont'd)</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> distance = <span class="kw">function</span> (p1, p2) {
+  <span class="kw">return</span> <span class="ot">Math</span>.<span class="fu">sqrt</span>(<span class="ot">Math</span>.<span class="fu">pow</span>(<span class="ot">p1</span>.<span class="fu">x</span> - <span class="ot">p2</span>.<span class="fu">x</span>, <span class="dv">2</span>) + <span class="ot">Math</span>.<span class="fu">pow</span>(<span class="ot">p1</span>.<span class="fu">y</span> - <span class="ot">p2</span>.<span class="fu">y</span>, <span class="dv">2</span>));
+};
+<span class="kw">var</span> squareArea = <span class="kw">function</span> (s) {
+  <span class="kw">var</span> d1 = <span class="fu">distance</span>(<span class="ot">s</span>.<span class="fu">p1</span>, <span class="ot">s</span>.<span class="fu">p2</span>);
+  <span class="kw">var</span> d2 = <span class="fu">distance</span>(<span class="ot">s</span>.<span class="fu">p1</span>, <span class="ot">s</span>.<span class="fu">p3</span>);
+  <span class="kw">var</span> length = (d1 &lt;= d2) ? d1 : d2;
+  <span class="kw">return</span> length * length;
+};
+<span class="fu">squareArea</span>(square);
+<span class="co">//: 16</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="create-object">Create Object</h3>
+<ul>
+<li>We create object by <strong>object literal</strong>:
+<ul>
+<li>object literal: {key: value, [key: value...]}</li>
+<li><strong><em>Key is unique.</em></strong></li>
+<li>we created a nested object. (since the value of <code>p1</code> is a object and etc.)</li>
+</ul></li>
+<li><p>You can create new property on the fly:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> obj = {
+  <span class="dt">a</span>: <span class="dv">0</span>
+};
+<span class="ot">obj</span>.<span class="fu">b</span> = <span class="dv">1</span>;
+obj;
+<span class="co">//: Object { a: 0, b: 1 }</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="access-object">Access object</h3>
+<ul>
+<li><p>We access the value of properties by pointing to their keys, such as:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="ot">square</span>.<span class="ot">p1</span>.<span class="fu">x</span>;
+<span class="co">//: 0, which is equals to:</span>
+<span class="kw">var</span> p1 = <span class="ot">square</span>.<span class="fu">p1</span>;
+<span class="ot">p1</span>.<span class="fu">x</span>;
+<span class="co">//: 0</span></code></pre></li>
+<li><p>Note: you can access properties in the form of square['p1'], too. (useful when you need to determine key on runtime.)</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="lets-rewrite-in-def.-2">Let's rewrite in Def. 2</h3>
+<ul>
+<li><p>Notice the parameters of squareArea is the same as the previous one.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> square = {
+  <span class="dt">c1</span>: {
+    <span class="dt">x</span>: <span class="dv">2</span>,
+    <span class="dt">y</span>: <span class="dv">2</span>
+  },
+  <span class="dt">side</span>: <span class="dv">4</span>
+};
+<span class="kw">var</span> squareArea = <span class="kw">function</span> (s) {
+  <span class="kw">return</span> <span class="ot">s</span>.<span class="fu">side</span> * <span class="ot">s</span>.<span class="fu">side</span>;
+};
+<span class="fu">squareArea</span>(square);
+<span class="co">//: 16</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="methods">Methods</h3>
+<ul>
+<li><p>When you put function into the object:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> square = {
+  <span class="dt">c1</span>: {
+    <span class="dt">x</span>: <span class="dv">2</span>,
+    <span class="dt">y</span>: <span class="dv">2</span>
+  },
+  <span class="dt">side</span>: <span class="dv">4</span>,
+  <span class="dt">getArea</span>: <span class="kw">function</span>() {
+    <span class="kw">return</span> <span class="kw">this</span>.<span class="fu">side</span> * <span class="kw">this</span>.<span class="fu">side</span>;
+  }
+};
+<span class="ot">square</span>.<span class="fu">getArea</span>();
+<span class="co">//: 16</span></code></pre></li>
+<li><code>this</code> is a reference to the object itself.</li>
+<li><p><em>array</em>.sort and such are all object methods.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="this"><code>this</code></h3>
+<ul>
+<li><p><code>this</code> depends on the current context where function is invoked:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// Notice we assign the function body instead of calling it.</span>
+<span class="kw">var</span> area = <span class="ot">square</span>.<span class="fu">getArea</span>;
+<span class="fu">area</span>();
+<span class="co">//: NaN</span></code></pre></li>
+<li><p>Since when the function is invoked, the current scope refers to the function body itself and outer (recall <em>closure</em>), and there is no <code>side</code> defined.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="function-vs.-method">Function vs. Method</h3>
+<ul>
+<li>We put function in a object (method) when it's dependent of the object.</li>
+<li>A good indicator is the use of <code>this</code>.</li>
+<li>Of course, it might arise political wars. : ) (Critical thinking, and only the paranoid survive!) <img src="assets/duty_calls.png" alt="Duty calls" /></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="create-object-based-on-the-existing-one.">Create object based on the existing one.</h3>
+<ul>
+<li><p>The object is by-reference, so the following don't copy new object. (They refers to the same object.)</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> obj = {
+  <span class="dt">foo</span>: <span class="st">&#39;bar&#39;</span>
+};
+<span class="kw">var</span> newObj = obj;
+<span class="ot">newObj</span>.<span class="fu">baz</span> = <span class="st">&#39;qux&#39;</span>;
+<span class="ot">obj</span>.<span class="fu">baz</span>;
+<span class="co">//: &#39;qux&#39;</span></code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>To construct a new object, we can use:
+<ul>
+<li>Object.create (ECMAScript 5)</li>
+<li><code>new</code> Keyword</li>
+<li>function returning new object</li>
+</ul></li>
+<li>We sticks to the first for now.</li>
+</ul>
+</section><section class="slide level2">
+
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> obj = {
+    <span class="dt">foo</span>: msg,
+    <span class="dt">baz</span>: <span class="st">&#39;qux&#39;</span>
+};
+
+<span class="kw">var</span> obj1 = <span class="ot">Object</span>.<span class="fu">create</span>(obj);
+<span class="kw">var</span> obj2 = <span class="ot">Object</span>.<span class="fu">create</span>(obj);
+<span class="ot">obj1</span>.<span class="fu">baz</span> = <span class="st">&#39;Lalala&#39;</span>;
+<span class="ot">obj2</span>.<span class="fu">baz</span>;
+<span class="co">//: &#39;qux&#39;</span></code></pre>
+</section><section class="slide level2">
+
+<h3 id="construct-playlist">Construct Playlist</h3>
+<ul>
+<li><p>Given the following playlist:</p>
+<pre><code>Track Name                Artist                   Duration (s)
+----------                ------                   ------------
+God Only Knows            The Beach Boys           171
+Piano Man                 Billy Joel               338
+New York, New York        Frank Sinatra            206
+My Way                    Frank Sinatra            276
+New York, New York        Cat Power                120
+Downtown Train            Everything but the Girl  184
+I&#39;m Gonna Be (500 Miles)  The Proclaimers          217
+La Vie En Rose            Cristin Milioti          115</code></pre></li>
+<li><p>Can you choose proper data structure for it?</p></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>Since it's a <em>playlist</em>, an array is a reasonable choice.</li>
+<li><p>How can we represent one song? Maybe using array:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> song = [<span class="st">&#39;God Only Knows&#39;</span>, <span class="st">&#39;The Beach Boys&#39;</span>, <span class="dv">171</span>];</code></pre></li>
+</ul>
+<p>and access the property by <code>song[0]</code>....</p>
+<ul>
+<li>Nah, it sucks.
+<ul>
+<li>We cannot determine the relation between properties and index directly!</li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><p>Using object:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> song = {
+  <span class="dt">title</span>: <span class="st">&#39;God Only Knows&#39;</span>,
+  <span class="dt">artist</span>: <span class="st">&#39;The Beach Boys&#39;</span>,
+  <span class="dt">duration</span>: <span class="dv">171</span>
+};</code></pre></li>
+<li><p>And we can puts it in an array:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> playlist = [
+  { <span class="dt">title</span>: <span class="st">&#39;God Only Knows&#39;</span>, <span class="dt">artist</span>: <span class="st">&#39;The Beach Boys&#39;</span>, <span class="dt">duration</span>: <span class="dv">171</span>}
+  ......
+];</code></pre></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="exercises-4">Exercises</h3>
+<ul>
+<li>We can answer questions like:
+<ul>
+<li>What songs is performed by <em>Frank Sinatra</em>?
+<ul>
+<li>Going through the list and find those performed by him.</li>
+</ul></li>
+<li>Can you sort the playlist by its duration?
+<ul>
+<li>Recall <em>array</em>.sort method?</li>
+</ul></li>
+<li>List all artists who perform <em>New York, New York</em>
+<ul>
+<li>Going through the list and find those performed the song.</li>
+</ul></li>
+<li>How many object exist in the code?
+<ul>
+<li>8? Are you sure...</li>
+</ul></li>
+</ul></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="inheritance">Inheritance</h3>
+<ul>
+<li>JavaScript uses prototype-based inheritance, by referring to existing object to extends its behaviours.</li>
+<li>Each object may has a <em>prototype reference</em>, which points to the object they want to inherit.</li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li>when you access properties, it searches from itself, then its prototype object. If the object is found and property exists, then it stops. If not, it searches from its prototype object again.... recursively, to <code>Object</code> or failed when it cannot find prototype object.</li>
+</ul>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> a = {
+  <span class="dt">foo</span>: <span class="st">&#39;bar&#39;</span>
+};
+<span class="kw">var</span> b = <span class="ot">Object</span>.<span class="fu">create</span>(a); 
+<span class="ot">a</span>.<span class="fu">isPrototypeOf</span>(b);
+<span class="co">//: true</span>
+<span class="ot">Object</span>.<span class="fu">getPrototypeOf</span>(b) === a;
+<span class="co">//: true, it refers to the same memory location.</span>
+<span class="ot">b</span>.<span class="fu">foo</span>;
+<span class="co">//: &quot;bar&quot;</span>
+<span class="ot">b</span>.<span class="fu">foo</span> = <span class="st">&#39;baz&#39;</span>;
+<span class="ot">b</span>.<span class="fu">foo</span>;
+<span class="co">//: &quot;baz&quot;, since b has its own foo property now, (what about a.foo?)</span></code></pre>
+</section><section class="slide level2">
+
+<ul>
+<li>So, instead of class-based, prototype-based much more like:</li>
+</ul>
+<p><img src="assets/class.png" /> <img src="assets/agent-smith.jpg" /></p>
+<ul>
+<li>To see more <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain">about prototype</a>.</li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="primitive-types-object-or-not">Primitive types: object or not?</h3>
+<ul>
+<li>Recall the definition of object:
+<ul>
+<li>An object is a collection of properties.</li>
+</ul></li>
+<li><em>str</em>.toUpperCase is a function, and it got a property called <em>toUpperCase</em>, so it's a object!?</li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><p><em>str</em>.toUpperCase is actually:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="st">&#39;It</span><span class="ch">\&#39;</span><span class="st">s over now, the music of the night!&#39;</span>.<span class="fu">toUpperCase</span>();
+<span class="co">//: &quot;IT&#39;S OVER NOW, THE MUSIC OF THE NIGHT!&quot;</span>
+<span class="co">// This is actually done via a wrapper object:</span>
+<span class="kw">var</span> str = <span class="kw">new</span> <span class="fu">String</span>(<span class="st">&#39;It</span><span class="ch">\&#39;</span><span class="st">s over now, the music of the night!&#39;</span>);
+<span class="ot">str</span>.<span class="fu">toUpperCase</span>();
+<span class="co">//: &quot;IT&#39;S OVER NOW, THE MUSIC OF THE NIGHT!&quot;</span></code></pre></li>
+<li><p>If you use <em>typeof</em> to check it's type.</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">typeof</span> str;
+<span class="co">//: &quot;object&quot;</span>
+<span class="kw">typeof</span> <span class="st">&#39;It</span><span class="ch">\&#39;</span><span class="st">s over now, the music of the night!&#39;</span>;
+<span class="co">//: &quot;string&quot;</span></code></pre></li>
+<li><p>Warning: <em>typeof</em> could be very deceiving, and <em>typeof</em> is a operator, not a function.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<h3 id="exercises-5">Exercises</h3>
+<ul>
+<li>After the accident of <em>Opéra de Paris</em>, the Phantom was on the run. He had an income of 22K and he needed to pay 15K to keep himself alive. Design an <em>phantom</em> object which helps him calculate how much he still had.</li>
+<li>Design an object representing your mobile, and explain your design.</li>
+</ul>
+</section></section>
+    </div>
+  </div>
+
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.min.js"></script>
+
+  <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        theme: 'serif', // available themes are in /css/theme
+        transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+//          { src: 'reveal.js/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; }, }
+//          { src: 'reveal.js/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+]});
+    </script>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="210" height="210" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <g>
+  <title>background</title>
+  <rect fill="#fff" id="canvas_background" height="212" width="212" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <rect id="svg_1" height="139.999998" width="139.999998" y="29.450001" x="31" stroke-width="1.5" stroke="#000" fill="#fff"/>
+  <text transform="matrix(0.561147, 0, 0, 0.561147, 12.0685, 84.6767)" xml:space="preserve" text-anchor="left" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_2" y="184.71903" x="6.615223" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#000000">(0, 0)</text>
+  <text style="cursor: move;" transform="matrix(0.561147, 0, 0, 0.561147, 12.0685, 84.6767)" xml:space="preserve" text-anchor="left" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_3" y="177.590773" x="273.924863" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#000000">(4, 0)</text>
+  <text style="cursor: move;" transform="matrix(0.561147, 0, 0, 0.561147, 12.0685, 84.6767)" xml:space="preserve" text-anchor="left" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_4" y="-116.449854" x="265.014541" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#000000">(4, 4)</text>
+  <text style="cursor: move;" transform="matrix(0.561147, 0, 0, 0.561147, 12.0685, 84.6767)" xml:space="preserve" text-anchor="left" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_5" y="-116.449854" x="1.269016" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#000000">(0, 4)</text>
+  <line stroke-linecap="null" stroke-linejoin="null" id="svg_6" y2="168.563823" x2="170.113822" y1="30.450001" x1="32" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" stroke="#000" fill="none"/>
+  <line stroke-linecap="null" stroke-linejoin="null" id="svg_11" y2="168.563823" x2="170.113822" y1="30.450001" x1="32" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" stroke="#000" fill="none"/>
+  <line stroke-linecap="null" stroke-linejoin="null" id="svg_14" y2="31.409462" x2="168.04054" y1="167.450002" x1="32" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" stroke="#000" fill="none"/>
+  <text style="cursor: move;" transform="matrix(0.561147, 0, 0, 0.561147, 12.0685, 84.6767)" xml:space="preserve" text-anchor="left" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_15" y="31.461501" x="181.25752" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#000000">(2, 2)</text>
+  <text xml:space="preserve" text-anchor="left" font-family="Helvetica, Arial, sans-serif" font-size="24" id="svg_17" y="190.450001" x="91" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#000000">4</text>
+ </g>
+</svg>

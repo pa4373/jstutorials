@@ -1,0 +1,1283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Wei-Shao Tang" />
+  <title>JavaScript: DOM / jQuery</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #0000ff; }
+code > span.ch { color: #008080; }
+code > span.st { color: #008080; }
+code > span.co { color: #008000; }
+code > span.ot { color: #ff4000; }
+code > span.al { color: #ff0000; }
+code > span.er { font-weight: bold; }
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <script type="text/javascript">/*<![CDATA[*/
+  /*
+  March 19, 2004 MathHTML (c) Peter Jipsen http://www.chapman.edu/~jipsen
+  Released under the GNU General Public License version 2 or later.
+  See the GNU General Public License (at http://www.gnu.org/copyleft/gpl.html)
+  for more details.
+  */
+  
+  function convertMath(node) {// for Gecko
+    if (node.nodeType==1) {
+      var newnode =
+        document.createElementNS("http://www.w3.org/1998/Math/MathML",
+          node.nodeName.toLowerCase());
+      for(var i=0; i < node.attributes.length; i++)
+        newnode.setAttribute(node.attributes[i].nodeName,
+          node.attributes[i].value);
+      for (var i=0; i<node.childNodes.length; i++) {
+        var st = node.childNodes[i].nodeValue;
+        if (st==null || st.slice(0,1)!=" " && st.slice(0,1)!="\n")
+          newnode.appendChild(convertMath(node.childNodes[i]));
+      }
+      return newnode;
+    }
+    else return node;
+  }
+  
+  function convert() {
+    var mmlnode = document.getElementsByTagName("math");
+    var st,str,node,newnode;
+    for (var i=0; i<mmlnode.length; i++)
+      if (document.createElementNS!=null)
+        mmlnode[i].parentNode.replaceChild(convertMath(mmlnode[i]),mmlnode[i]);
+      else { // convert for IE
+        str = "";
+        node = mmlnode[i];
+        while (node.nodeName!="/MATH") {
+          st = node.nodeName.toLowerCase();
+          if (st=="#text") str += node.nodeValue;
+          else {
+            str += (st.slice(0,1)=="/" ? "</m:"+st.slice(1) : "<m:"+st);
+            if (st.slice(0,1)!="/")
+               for(var j=0; j < node.attributes.length; j++)
+                 if (node.attributes[j].value!="italic" &&
+                   node.attributes[j].value!="" &&
+                   node.attributes[j].value!="inherit" &&
+                   node.attributes[j].value!=undefined)
+                   str += " "+node.attributes[j].nodeName+"="+
+                       "\""+node.attributes[j].value+"\"";
+            str += ">";
+          }
+          node = node.nextSibling;
+          node.parentNode.removeChild(node.previousSibling);
+        }
+        str += "</m:math>";
+        newnode = document.createElement("span");
+        node.parentNode.replaceChild(newnode,node);
+        newnode.innerHTML = str;
+      }
+  }
+  
+  if (document.createElementNS==null) {
+    document.write("<object id=\"mathplayer\"\
+    classid=\"clsid:32F66A20-7614-11D4-BD11-00104BD3F987\"></object>");
+    document.write("<?import namespace=\"m\" implementation=\"#mathplayer\"?>");
+  }
+  if(typeof window.addEventListener != 'undefined'){
+    window.addEventListener('load', convert, false);
+  }
+  if(typeof window.attachEvent != 'undefined') {
+    window.attachEvent('onload', convert);
+  }
+  /*]]>*/
+  </script>
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">JavaScript: DOM / jQuery</h1>
+  <p class="author">
+Wei-Shao Tang
+  </p>
+  <p class="date">May 5, 2015</p>
+</div>
+<div id="topics-covered" class="slide section level1">
+<h1>Topics Covered</h1>
+<!--Include jQuery library to actiavte interactive demo-->
+<script type='text/javascript' src='http://code.jquery.com/jquery-2.1.3.min.js'></script>
+<ul>
+<li>How Browser Works.</li>
+<li>DOM and DOM API.</li>
+<li>jQuery Library.
+<ul>
+<li>DOM Traversal and Manipulation</li>
+<li>Event-Driven Programming</li>
+<li>AJAX</li>
+<li>jQuery plugins (Bootstrap)</li>
+</ul></li>
+<li>NOTICE: This tutorial includes interactive demo, it's better to see html version if you currently aren't: <a href="http://pa4373.github.io/jstutorials/dom_jquery.html" class="uri">http://pa4373.github.io/jstutorials/dom_jquery.html</a></li>
+</ul>
+</div>
+<div id="how-browser-works" class="slide section level1">
+<h1>How Browser Works?</h1>
+<ul>
+<li><p>Given the following html snippet:</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;html</span><span class="ot"> lang=</span><span class="st">&#39;en&#39;</span><span class="kw">&gt;</span>
+<span class="kw">&lt;head&gt;</span>
+    <span class="kw">&lt;meta</span><span class="ot"> charset=</span><span class="st">&#39;utf-8&#39;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;title&gt;</span>Sample Page<span class="kw">&lt;/title&gt;</span>
+<span class="kw">&lt;/head&gt;</span>
+<span class="kw">&lt;body&gt;</span>
+    <span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&#39;content&#39;</span><span class="kw">&gt;&lt;/div&gt;</span>
+    <span class="kw">&lt;script</span><span class="ot"> type=</span><span class="st">&#39;text/javascript&#39;</span><span class="kw">&gt;</span>
+    (<span class="kw">function</span> () {
+      <span class="kw">var</span> domObj = <span class="ot">document</span>.<span class="fu">getElementById</span>(<span class="st">&#39;content&#39;</span>);
+      <span class="ot">domObj</span>.<span class="fu">innerHTML</span> = <span class="st">&#39;Hello World!&#39;</span>;
+    })();
+    &lt;<span class="ot">/script&gt;</span>
+<span class="ot">&lt;/body</span>&gt;
+&lt;<span class="ot">/html&gt;</span></code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="how-browser-works-contd" class="slide section level1">
+<h1>How Browser Works? (Cont'd)</h1>
+<ul>
+<li>It can be transformed to what we see:</li>
+</ul>
+<div class="figure">
+<img src="assets/browser-render.png" alt="The Result Rendered by Mozilla Firefox" />
+<p class="caption">The Result Rendered by Mozilla Firefox</p>
+</div>
+</div>
+<div id="how-browser-works-partially" class="slide section level1">
+<h1>How Browser Works? (Partially)</h1>
+<ul>
+<li>Source <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo accent="false">→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> (DOM Parser) <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo accent="false">→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> DOM Tree <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo accent="false">→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> (Render Engine) <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo accent="false">→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> What we saw.
+<ol style="list-style-type: decimal">
+<li>Source code (plain text) will be parsed to DOM tree.</li>
+<li>With DOM tree, browser will render content on the screen accordingly. (with CSS, if exists.)</li>
+</ol></li>
+<li>DOM stands for <em>Document Object Model</em>.</li>
+<li><strong>DOM Tree</strong> is essentially <strong>data represented in tree structure</strong>.</li>
+</ul>
+</div>
+<div id="dom-and-dom-api" class="slide section level1">
+<h1>DOM and DOM API</h1>
+<ul>
+<li>Such design enables the possibility to use a script language to provide interaction with users.</li>
+<li>After DOM objects were created, the script has access to those objects via <strong>DOM API</strong>.</li>
+<li>In the context, the script is written in JavaScript.
+<ul>
+<li>There might be others such as VBScript (dead already), Java Applet...</li>
+</ul></li>
+<li>Remark: The program responsible for executing JavaScript codes called 'JavaScript Engine.'</li>
+</ul>
+</div>
+<div id="dom-api-in-javascript" class="slide section level1">
+<h1>DOM API (in JavaScript)</h1>
+<ul>
+<li><p>DOM API looks like this:</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> domObj = <span class="ot">document</span>.<span class="fu">getElementById</span>(<span class="st">&#39;content&#39;</span>);
+<span class="co">// get dom object which &#39;id&#39; is &#39;content&#39;</span>
+<span class="kw">var</span> newDomObj = <span class="ot">document</span>.<span class="fu">createTextNode</span>(<span class="st">&quot;Water&quot;</span>);
+<span class="co">// create new dom object.</span>
+<span class="ot">domObj</span>.<span class="fu">appendChild</span>(newDomObj);
+<span class="co">// insert new node to the selected as its child.</span>
+<span class="ot">domObj</span>.<span class="fu">addEventListener</span>(<span class="st">&#39;click&#39;</span>, <span class="kw">function</span> () {
+  <span class="ot">window</span>.<span class="fu">alert</span>(<span class="st">&#39;WHOOOPAH!&#39;</span>);
+});
+<span class="co">// Upon clicking the text, show the alert box.  </span></code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="dom-api-in-javascript-contd" class="slide section level1">
+<h1>DOM API (in Javascript, Cont'd)</h1>
+<ul>
+<li>It includes:
+<ul>
+<li>Traversal: Select DOM objects satisfying criteria.</li>
+<li>Manipulation: Change its attributes, add / remove it's parent / children node and such.</li>
+<li>Event Handling: <strong>Binding</strong> functions when certain events occur, such as <em>click</em>.</li>
+</ul></li>
+<li>Basically, you operate on a tree structure.</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model">More</a></li>
+</ul>
+</div>
+<div id="how-to-write-javascript-in-browser" class="slide section level1">
+<h1>How to write JavaScript in Browser?</h1>
+<ul>
+<li><p>Either by putting codes inline in <code>&lt;script&gt;</code> tag:</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html">...
+    <span class="kw">&lt;script</span><span class="ot"> type=</span><span class="st">&#39;text/javascript&#39;</span><span class="kw">&gt;</span>
+    (<span class="kw">function</span> () {
+      your code goes <span class="ot">here</span>.....
+    })();
+    &lt;<span class="ot">/script&gt;</span>
+<span class="ot">&lt;/body</span>&gt;
+&lt;<span class="ot">/html&gt;</span></code></pre></td></tr></table></li>
+<li><p>or link to external file:</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;script</span><span class="ot"> type=</span><span class="st">&#39;text/javascript&#39;</span><span class="ot"> src=</span><span class="st">&#39;main.js&#39;</span><span class="kw">&gt;&lt;/script&gt;</span></code></pre></td></tr></table></li>
+</ul>
+<p>where JavaScript codes lie in <em>main.js</em>.</p>
+</div>
+<div id="how-to-write-javascript-in-browser-contd" class="slide section level1">
+<h1>How to write JavaScript in Browser? (Cont'd)</h1>
+<ul>
+<li>Where to put the script tags?
+<ul>
+<li>Well, it varies, the main concerns are:
+<ol style="list-style-type: decimal">
+<li>Validity of HTML</li>
+<li>Synchronous Loading (Blocking)</li>
+</ol></li>
+</ul></li>
+<li>Validity of HTML means your code following the standard of HTML structure.</li>
+<li>Synchronous Loading: When browser loads your HTML, it parses line by line, constructs DOM tree and renders accordingly.
+<ul>
+<li>If it encounters <code>script</code> tags, either it executes immediately,</li>
+<li>or it loads external files.</li>
+<li>All operations blocks the web page rendering.</li>
+</ul></li>
+</ul>
+</div>
+<div id="how-to-write-javascript-in-browser-contd-1" class="slide section level1">
+<h1>How to write JavaScript in Browser? (Cont’d)</h1>
+<ul>
+<li>Few years ago, it's wildly recommended to put script tags <strong>at the bottom of <code>body</code> section</strong>, since JS codes don't load until DOM tree is constructed:
+<ul>
+<li>However, if your codebase is quite large (think of Facebook), your users have to wait longer for your application initialised.</li>
+<li>For small size program, this works just fine.</li>
+</ul></li>
+<li>For modern browsers, you can put <code>script</code> tags <strong>at the bottom of <code>head</code> with <code>async</code> or <code>defer</code> attributes</strong>:</li>
+</ul>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;script</span><span class="ot"> type=</span><span class="st">&#39;text/javascript&#39;</span><span class="ot"> src=</span><span class="st">&#39;app1.js&#39;</span><span class="ot"> defer</span><span class="kw">&gt;&lt;/script&gt;</span>
+<span class="kw">&lt;script</span><span class="ot"> type=</span><span class="st">&#39;text/javascript&#39;</span><span class="ot"> src=</span><span class="st">&#39;app2.js&#39;</span><span class="ot"> defer</span><span class="kw">&gt;&lt;/script&gt;</span></code></pre></td></tr></table>
+<ul>
+<li>Scripts with <code>async</code> tag executes immediately upon file is loaded, which is non-deterministic, while <code>defer</code> tag ensures your files executes in sequence asynchronously.</li>
+</ul>
+</div>
+<div id="debug-trick" class="slide section level1">
+<h1>Debug trick</h1>
+<ul>
+<li>WARNING: The trick code demonstrated below shall be in development only, remove it when it's ready to go production.</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li><code>console.log</code>: Print text under the JavaScript REPL. If your input is object / array, it allows you to inspect its attribute.</li>
+</ol>
+<div class="figure">
+<img src="assets/repl.png" alt="console.log on REPL" />
+<p class="caption">console.log on REPL</p>
+</div>
+</div>
+<div id="debugger" class="slide section level1">
+<h1>Debugger</h1>
+<ul>
+<li>'The formal way' to debug your application. (<a href="http://vinta.ws/blog/695">see the joke</a>)</li>
+<li>Basic steps:
+<ol style="list-style-type: decimal">
+<li>Navigate to the code section you would like to inspect.</li>
+<li>Set proper breakpoints</li>
+<li>Execute program, and the program stops at breakpoints.</li>
+<li>Inspect the program state at the moment.</li>
+</ol></li>
+<li>Details varies in different browsers, you might want to check out yourself:
+<ul>
+<li>Firefox: <a href="https://developer.mozilla.org/en-UK/docs/Tools/Debugger" class="uri">https://developer.mozilla.org/en-UK/docs/Tools/Debugger</a></li>
+<li>Chrome: <a href="https://developer.chrome.com/devtools/docs/javascript-debugging" class="uri">https://developer.chrome.com/devtools/docs/javascript-debugging</a></li>
+</ul></li>
+</ul>
+</div>
+<div id="jquery" class="slide section level1">
+<h1>jQuery</h1>
+<ul>
+<li>DOM Traversal / Manipulation can be tedious, using native API.</li>
+<li>You need to pay attention to Cross-Browser compatibility.</li>
+<li>Writing DOM animation can be hard, at least for me. (though with the advent of CSS3 animation it changes.)</li>
+</ul>
+</div>
+<div id="jquery-contd" class="slide section level1">
+<h1>jQuery (Cont'd)</h1>
+<ul>
+<li><p>To address those problems, jQuery was born to simplify those task:</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> domObj = <span class="ot">document</span>.<span class="fu">getElementById</span>(<span class="st">&#39;content&#39;</span>);
+<span class="ot">domObj</span>.<span class="fu">innerHTML</span> = <span class="st">&#39;Hello World!&#39;</span>;
+<span class="co">// Using Native DOM API</span>
+<span class="fu">$</span>(<span class="st">&#39;#content&#39;</span>).<span class="fu">text</span>(<span class="st">&#39;Hello World!&#39;</span>);
+<span class="co">// Using jQuery</span></code></pre></td></tr></table></li>
+<li>Originally written by John Resig, jQuery is the most popular JavaScript library in use today. (<a href="http://trends.builtwith.com/javascript/jQuery">source</a>)</li>
+<li>Massive plugins to create different effects.</li>
+<li>While experienced programmers tend to reduce their dependence on jQuery for better portability, modularity and performance, it increases the development speed.</li>
+<li><p>REMARK: jQuery is a library, and your vanilla JavaScript works just fine without it. (<a href="http://vanilla-js.com/">see the prank</a>)</p></li>
+</ul>
+</div>
+<div id="how-to-use-jquery" class="slide section level1">
+<h1>How to use jQuery</h1>
+<ul>
+<li>We sticks to jQuery 2.x in this tutorial.</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>You need to include it in your page at first.
+<ol style="list-style-type: decimal">
+<li>Navigate to <a href="https://jquery.com/download/" class="uri">https://jquery.com/download/</a>, download the compressed, production version.</li>
+<li><p>Let's assume the downloaded file called <strong>jquery.min.js</strong>, include it in your page:</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;script</span><span class="ot"> type=</span><span class="st">&#39;text/javascript&#39;</span><span class="ot"> src=</span><span class="st">&#39;jquery.min.js&#39;</span><span class="kw">&gt;&lt;/script&gt;</span></code></pre></td></tr></table></li>
+<li>Put your script tag below the jQuery tag.</li>
+</ol></li>
+<li><p>To test if it works, put the following code and test if jQuery works:</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(document).<span class="fu">ready</span>(<span class="kw">function</span> (){
+  <span class="fu">$</span>(<span class="st">&#39;body&#39;</span>).<span class="fu">text</span>(<span class="st">&#39;jQuery works!&#39;</span>);
+});</code></pre></td></tr></table></li>
+</ol>
+<p>(or just puts your download link in <code>src</code> directly.)</p>
+</div>
+<div id="basic-model" class="slide section level1">
+<h1>Basic Model</h1>
+<ul>
+<li>jQuery is a giant function (object) with an identifier, usually with <code>$</code>. (<code>jQuery</code> itself works.)</li>
+<li>DOM:
+<ol style="list-style-type: decimal">
+<li>You <strong>select</strong> some elements.</li>
+<li>and you either <strong>manipulate</strong> them or <strong>bind events</strong> for them. (object method)</li>
+<li>(or using jQuery to create new DOM and insert to page later.)</li>
+</ol></li>
+<li>Not-related to DOM: Simplified helper function to work with. (function, ex: jQuery's ajax function: $.ajax)</li>
+</ul>
+</div>
+<div id="document.readyfn" class="slide section level1">
+<h1>$(document).ready(fn)</h1>
+<ul>
+<li>A page can't be manipulated safely until the document is loaded.
+<ul>
+<li>We've seen this in <em>Synchronous Loading</em>.</li>
+</ul></li>
+<li><p>Instead of moving around your script tag, jQuery provides a method on <em>document</em> object, which <em>binds function</em> to event when <em>your page is loaded. (a.k.a ready)</em>:</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(document).<span class="fu">ready</span>(<span class="kw">function</span> () {
+  <span class="co">// your code won&#39;t run until the page is ready.</span>
+});
+<span class="co">// your code runs as soon as loaded.  </span></code></pre></td></tr></table>
+<p>which can be simplified into:</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(<span class="kw">function</span> () {
+  <span class="co">// your code won&#39;t run until the page is ready.</span>
+});</code></pre></td></tr></table></li>
+<li><p><strong>It's good habit to put your code in the supplied function.</strong></p></li>
+</ul>
+</div>
+<div id="dom-traversal" class="slide section level1">
+<h1>DOM Traversal</h1>
+<ul>
+<li>In jQuery, DOM traversal can be seen as three kinds:
+<ol style="list-style-type: decimal">
+<li>Ad-Hoc Selection: Using <em>CSS selector</em> to directly specify elements in documents.</li>
+<li>Relative Position Lookup: Given one node on DOM tree, find its parent / children nodes.</li>
+<li>Filtering current collections.</li>
+</ol>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> contentNode = <span class="fu">$</span>(<span class="st">&#39;#content&#39;</span>);
+<span class="co">// Fetch the node with id `content`</span>
+<span class="ot">contentNode</span>.<span class="fu">children</span>().<span class="fu">filter</span>(<span class="st">&#39;:even&#39;</span>)
+.<span class="fu">each</span>(<span class="kw">function</span> () {
+  <span class="ot">window</span>.<span class="fu">alert</span>(<span class="fu">$</span>(<span class="kw">this</span>).<span class="fu">text</span>());
+});
+<span class="co">/* Fetch its children, choose the even ones only,</span>
+<span class="co">and print out its value,</span>
+<span class="co">the form is tricky for now, but we&#39;ll see it later.*/</span></code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="dom-traversal-contd" class="slide section level1">
+<h1>DOM Traversal (Cont'd)</h1>
+<ul>
+<li>CSS Selector: Pretty much the same as what you learned in CSS3 part.
+<ul>
+<li>To inspect quickly: Fire up [Inspect Element], navigate to [Inspector], look for desired dom object and right click [Get Unique Selector] (Firefox)</li>
+</ul></li>
+<li>the results you got, known as <strong>jQuery collection</strong>, which you can manipulate later on.</li>
+<li>When you applied method related to DOM traversal / manipulation, jQuery returns <strong>itself</strong>, hence it supports <strong>chaining</strong>.</li>
+</ul>
+</div>
+<div id="function-chaining" class="slide section level1">
+<h1>Function chaining:</h1>
+<ul>
+<li><p>Recall string <a href="https://www.youtube.com/watch?v=vU81DihqD0c">example</a>:</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="st">&#39;I</span><span class="ch">\&#39;</span><span class="st">m gonna be 500 Miles&#39;</span>
+.<span class="fu">replace</span>(<span class="st">&#39;gonna be &#39;</span>, <span class="st">&#39;would walk &#39;</span>).<span class="fu">toUpperCase</span>();
+<span class="co">//: &quot;I&#39;M WOULD WALK 500 MILES&quot;</span></code></pre></td></tr></table></li>
+<li>You can see after <code>replace</code> function is applied, a new string is generated, and the new string invokes <code>toUpperCase</code> method and so on..</li>
+<li>Intuitively, The function acts as giant <strong>function (object) with internal states change</strong>, and this case applied to jQuery, too.
+<ul>
+<li>REMARK: String operation is actually object wrapper.</li>
+<li>Hence we can see jQuery collection as jQuery function with references to selected objects.</li>
+<li>Technical detail: You can enable chaining by return <code>this</code> (current object) in your object method. <a href="http://schier.co/blog/2013/11/14/method-chaining-in-javascript.html">See more</a>.</li>
+</ul></li>
+</ul>
+</div>
+<div id="dom-traversal-contd-1" class="slide section level1">
+<h1>DOM Traversal (Cont'd)</h1>
+<ul>
+<li><p>Consider the following HTML and JavaScript snippets, it converts all characters to upper case:</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;blockquote</span><span class="ot"> id=</span><span class="st">&#39;hawking&#39;</span><span class="kw">&gt;</span>
+The victim should have the right to end his life,
+if he wants. But I think it would be a great mistake.
+However bad life may seem, there is always something
+you can do, and succeed at.
+While there&#39;s life, there is hope. ~ Stephen Hawking
+<span class="kw">&lt;/blockquote&gt;</span></code></pre></td></tr></table>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> hawkingQuote = <span class="fu">$</span>(<span class="st">&#39;#hawking&#39;</span>);
+<span class="kw">var</span> text = <span class="ot">hawkingQuote</span>.<span class="fu">text</span>();
+<span class="ot">hawkingQuote</span>.<span class="fu">text</span>(<span class="ot">text</span>.<span class="fu">toUpperCase</span>());</code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="dom-traversal-contd-2" class="slide section level1">
+<h1>DOM Traversal (Cont'd)</h1>
+<ul>
+<li>Checkout the demo:</li>
+</ul>
+<p><span id="hawkingDemo"><em>[Hover over me to see demo.]</em></span></p>
+<blockquote id="hawking">
+The victim should have the right to end his life, if he wants. But I think it would be a great mistake. However bad life may seem, there is always something you can do, and succeed at. While there's life, there is hope. ~ Stephen Hawking
+</blockquote>
+<script type='text/javascript'>
+var hawkingQuote = $('#hawking');
+var originalQuote = hawkingQuote.text();
+$('#hawkingDemo').hover(function () {
+  hawkingQuote.text(originalQuote.toUpperCase());
+}, function () {
+  hawkingQuote.text(originalQuote);
+});
+</script>
+</div>
+<div id="dom-traversal-contd-3" class="slide section level1">
+<h1>DOM Traversal (Cont'd)</h1>
+<ul>
+<li><p>What happened?</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> hawkingQuote = <span class="fu">$</span>(<span class="st">&#39;#hawking&#39;</span>);
+<span class="kw">var</span> text = <span class="ot">hawkingQuote</span>.<span class="fu">html</span>();
+<span class="ot">hawkingQuote</span>.<span class="fu">html</span>(<span class="ot">text</span>.<span class="fu">toUpperCase</span>());</code></pre></td></tr></table></li>
+<li>In line 1, we initialise our jQuery function with <strong>nevigating its focus on 'hawking' object.</strong>
+<ul>
+<li>It's <strong>ad-hoc selection</strong>, with jQuery collection containing <strong>one object</strong>.</li>
+</ul></li>
+<li>To extract its value, we call <code>text</code> function in line 2 and it returns;</li>
+<li>Then, we set its value with uppercased version of the string, in line 3.
+<ul>
+<li>Although we haven't covered DOM manipulation, yet. See <code>text</code> as content getter / setter, depending on whether the parameter is given.</li>
+</ul></li>
+</ul>
+</div>
+<div id="dom-traversal-contd-4" class="slide section level1">
+<h1>DOM Traversal (Cont'd)</h1>
+<ul>
+<li><p>Another example. It converts to upper case if the item is odd-indexed.</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;ol</span><span class="ot"> id=</span><span class="st">&#39;songList&#39;</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;li&gt;</span>Led Zeppelin - Kashmir<span class="kw">&lt;/li&gt;</span>
+    <span class="kw">&lt;li&gt;</span>Billy Joel - Piano Man<span class="kw">&lt;/li&gt;</span>
+    <span class="kw">&lt;li&gt;</span>John Mayer - Gravity<span class="kw">&lt;/li&gt;</span>
+    <span class="kw">&lt;li&gt;</span>The Black Angels - Young Men Dead<span class="kw">&lt;/li&gt;</span>
+    <span class="kw">&lt;li&gt;</span>John Mayer - Slow Dancing In A Burning Room<span class="kw">&lt;/li&gt;</span>
+    <span class="kw">&lt;li&gt;</span>Jimi Hendrix - Voodoo Chile<span class="kw">&lt;/li&gt;</span>
+<span class="kw">&lt;/ol&gt;</span></code></pre></td></tr></table>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(<span class="st">&#39;#songList&#39;</span>).<span class="fu">children</span>().<span class="fu">filter</span>(<span class="st">&#39;:even&#39;</span>)
+.<span class="fu">each</span>(<span class="kw">function</span> (idx, ele) {
+  <span class="kw">var</span> newText = <span class="fu">$</span>(ele).<span class="fu">text</span>().<span class="fu">toUpperCase</span>();
+  <span class="fu">$</span>(ele).<span class="fu">text</span>(newText);
+});</code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="dom-traversal-contd-5" class="slide section level1">
+<h1>DOM Traversal (Cont'd)</h1>
+<ul>
+<li>Check out the demo:</li>
+</ul>
+<p><span id="songListDemo"><em>[Hover over me to see demo.]</em></span></p>
+<ol style="list-style-type: decimal">
+<li>Led Zeppelin - Kashmir</li>
+<li>Billy Joel - Piano Man</li>
+<li><a href="https://www.youtube.com/watch?v=Fo4746XZgw8">John Mayer - Gravity</a></li>
+<li>The Black Angels - Young Men Dead</li>
+<li>John Mayer - Slow Dancing In A Burning Room</li>
+<li>Jimi Hendrix - Voodoo Chile</li>
+</ol>
+<script type='text/javascript'>
+var songList = $('#dom-traversal-contd-5 > ol:nth-child(4)');
+var originalList = songList.html();
+$('#songListDemo').hover(function () {
+  songList.children().filter(':even').each(function (idx, ele) {
+    var newText = $(ele).text().toUpperCase();
+    $(ele).text(newText);
+  });
+}, function () {
+  songList.html(originalList);
+});
+</script>
+</div>
+<div id="dom-traversal-contd-6" class="slide section level1">
+<h1>DOM Traversal (Cont'd)</h1>
+<ul>
+<li><p>What happened?</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(<span class="st">&#39;#songList&#39;</span>).<span class="fu">children</span>().<span class="fu">filter</span>(<span class="st">&#39;:even&#39;</span>)
+.<span class="fu">each</span>(<span class="kw">function</span> (idx, ele) {
+  <span class="kw">var</span> newText = <span class="fu">$</span>(ele).<span class="fu">text</span>().<span class="fu">toUpperCase</span>();
+  <span class="fu">$</span>(ele).<span class="fu">text</span>(newText);
+});</code></pre></td></tr></table></li>
+<li>In line 1, we select <code>songList</code> item, get its children nodes, and then convert some to upper case.
+<ol style="list-style-type: decimal">
+<li>For $('#songList'), it's standard ad-hoc selection with one object in jQuery collection. (<code>ol</code>)</li>
+<li>then we use <code>children</code> method to get its children, it's relative position lookup, resulted in multiple objects in collection. (multiple <code>li</code>)</li>
+</ol></li>
+</ul>
+</div>
+<div id="dom-traversal-contd-7" class="slide section level1">
+<h1>DOM Traversal (Cont'd)</h1>
+<ul>
+<li><p>What happened?</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(<span class="st">&#39;#songList&#39;</span>).<span class="fu">children</span>().<span class="fu">filter</span>(<span class="st">&#39;:even&#39;</span>)
+.<span class="fu">each</span>(<span class="kw">function</span> (idx, ele) {
+  <span class="kw">var</span> newText = <span class="fu">$</span>(ele).<span class="fu">text</span>().<span class="fu">toUpperCase</span>();
+  <span class="fu">$</span>(ele).<span class="fu">text</span>(newText);
+});</code></pre></td></tr></table></li>
+<li>In Line 2, we choose the even elements, using <code>filter</code>, resulted in the subset of the previous collection. (multiple <code>li</code>)</li>
+<li><p>Then we <em>ITERATE</em> the collection, using <code>each</code> method.</p></li>
+</ul>
+</div>
+<div id="dom-traversal-contd-8" class="slide section level1">
+<h1>DOM Traversal (Cont'd)</h1>
+<ul>
+<li>Why not <code>for (; ;)</code> loop?
+<ul>
+<li>Well, because what you got is not an array or any array-like object.</li>
+</ul></li>
+<li>However, it suffice to provide equivalent effect as <code>for</code> loop:
+<ul>
+<li>inx: the current index of the object, starting from 0.</li>
+<li>ele: the current item. To use with jQuery, pass it to <code>$</code> again.</li>
+</ul></li>
+<li><p>Conceptual Analogy:</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="ot">$coll</span>.<span class="fu">each</span>(<span class="kw">function</span> (inx, ele) {
+  <span class="co">// code block....</span>
+});
+
+<span class="kw">for</span> (<span class="kw">var</span> inx = <span class="dv">0</span>; inx &lt; <span class="ot">$coll</span>.<span class="fu">length</span>; inx = inx + <span class="dv">1</span>) {
+  <span class="kw">var</span> ele = $coll[inx];
+  <span class="co">// code block....</span>
+}  
+<span class="co">// Note this won&#39;t work in real case.</span></code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="dom-traversal-contd-9" class="slide section level1">
+<h1>DOM Traversal (Cont'd)</h1>
+<ul>
+<li>In contrast to <code>children</code> method, <code>parents</code> method gets the parent node of the current node.</li>
+<li>For complete ad-doc selection, consult: <a href="http://api.jquery.com/category/selectors/hierarchy-selectors/" class="uri">http://api.jquery.com/category/selectors/hierarchy-selectors/</a></li>
+<li>For filtering, consult: <a href="http://api.jquery.com/category/traversing/filtering/" class="uri">http://api.jquery.com/category/traversing/filtering/</a></li>
+<li>For complete tree traversal, consult: <a href="http://api.jquery.com/category/traversing/" class="uri">http://api.jquery.com/category/traversing/</a></li>
+<li>This concludes the DOM traversal chapter.</li>
+</ul>
+</div>
+<div id="dom-manipulation" class="slide section level1">
+<h1>DOM Manipulation</h1>
+<ul>
+<li>After you located your target collection, you can:
+<ol style="list-style-type: decimal">
+<li>Read / Modify its <strong>CSS class</strong> and <strong>CSS style</strong>.</li>
+<li>Read / Modify its attribute. (href, src ...)</li>
+<li>Insert / Remove element around them.</li>
+<li>Use some built-in animations.</li>
+</ol></li>
+<li>Based on those operations, you can even use <strong>plugins</strong> to create astonishing effects with little effort.</li>
+</ul>
+</div>
+<div id="dom-manipulation-contd" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li><p>Given the following HTML, CSS, and JavaScript snippets:</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;blockquote</span><span class="ot"> id=</span><span class="st">&#39;russell&#39;</span><span class="kw">&gt;</span>
+A man would not say &quot;I hope the first President of the
+United States will be the first President of the United
+States&quot; unless he had an unusual passion for the law of
+identity. ~ Bertrand Russell, Western Philosophy
+<span class="kw">&lt;/blockquote&gt;</span></code></pre></td></tr></table>
+<table class="sourceCode css numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+</pre></td><td class="sourceCode"><pre><code class="sourceCode css"><span class="fl">.quote-border</span> <span class="kw">{</span>
+  <span class="kw">border:</span> <span class="dt">1px</span> <span class="dt">#777</span> <span class="dt">dashed</span><span class="kw">;</span>
+  <span class="kw">margin:</span> <span class="dt">5px</span><span class="kw">;</span>
+<span class="kw">}</span></code></pre></td></tr></table>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(<span class="st">&#39;#russell&#39;</span>).<span class="fu">addClass</span>(<span class="st">&#39;quote-border&#39;</span>);</code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="dom-manipulation-contd-1" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li>See the live demo:
+<style type='text/css'>
+.quote-border {
+  border: 1px #777 dashed;
+  margin: 5px;
+}
+</style></li>
+</ul>
+<span id="russell-hover"><em>[Hover over me to see demo.]</em></span>
+<blockquote id="russell">
+A man would not say &quot;I hope the first President of the United States will be the first President of the United States&quot; unless he had an unusual passion for the law of identity. ~ Bertrand Russell, Western Philosophy
+</blockquote>
+<script type='text/javascript'>
+var russell = $('#russell');
+$('#russell-hover').hover(function () {
+  russell.addClass('quote-border');
+}, function () {
+  russell.removeClass('quote-border');
+});
+</script>
+</div>
+<div id="dom-manipulation-contd-2" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li>It's obvious that <code>addClass</code> will append new class to elements <code>class</code> attribute.</li>
+<li>The opposite of <code>addClass</code> is <code>removeClass</code>.</li>
+</ul>
+</div>
+<div id="dom-manipulation-contd-3" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li>Given the following HTML and JavaScript snippets:</li>
+</ul>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;img</span><span class="ot"> src=</span><span class="st">&#39;assets/hover1.jpg&#39;</span><span class="ot"> id=</span><span class="st">&#39;barney&#39;</span><span class="kw">&gt;</span></code></pre></td></tr></table>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> barney = <span class="fu">$</span>(<span class="st">&#39;#barney&#39;</span>);
+<span class="kw">var</span> original = <span class="ot">barney</span>.<span class="fu">attr</span>(<span class="st">&#39;src&#39;</span>);
+<span class="co">// original will hold &#39;assets/hover1.jpg&#39;</span>
+<span class="ot">barney</span>.<span class="fu">attr</span>(<span class="st">&#39;src&#39;</span>, <span class="st">&#39;assets/hover2.jpg&#39;</span>);</code></pre></td></tr></table>
+<ul>
+<li><code>attr</code> is also a setter / getter, depending on whether the parameter is given.</li>
+<li>in line 4, it changes its value to <code>assets/hover2.jpg</code></li>
+</ul>
+</div>
+<div id="dom-manipulation-contd-4" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li>See the demo:</li>
+</ul>
+<p><span id="barney-hover"><em>[Hover over me to see demo.]</em></span></p>
+<img src='assets/hover1.jpg' id='barney'>
+<script type='text/javascript'>
+var barney = $('#barney');
+$('#barney-hover').hover(function () {
+  barney.attr('src', 'assets/hover2.jpg');
+}, function () {
+  barney.attr('src', 'assets/hover1.jpg');
+});
+</script>
+</div>
+<div id="dom-manipulation-contd-5" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li><p>Given the following HTML, CSS and JavaScript snippets:</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&#39;source&#39;</span><span class="kw">&gt;</span>
+  Come back you little bastard!
+<span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&#39;target&#39;</span><span class="kw">&gt;</span>
+  Mom, I&#39;m here!
+<span class="kw">&lt;/div&gt;</span></code></pre></td></tr></table>
+<table class="sourceCode css numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+</pre></td><td class="sourceCode"><pre><code class="sourceCode css"><span class="fl">#target</span> <span class="kw">{</span>
+  <span class="kw">border:</span> <span class="dt">1px</span> <span class="dt">#777</span> <span class="dt">solid</span><span class="kw">;</span>
+<span class="kw">}</span></code></pre></td></tr></table>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> source = <span class="fu">$</span>(<span class="st">&#39;#source&#39;</span>)
+<span class="fu">$</span>(<span class="st">&#39;#target&#39;</span>).<span class="fu">append</span>(source);</code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="dom-manipulation-contd-6" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li>See the live demo: <span id="append-hover"><em>[Hover over me to see demo.]</em></span>
+<div id="source">
+<p>Come back you little bastard!</p>
+</div>
+<div id="target">
+<p>Mom, I'm here!</p>
+</div></li>
+</ul>
+<style type='text/css'>
+#target {
+  border: 1px #777 solid;
+}
+</style>
+<script type='text/javascript'>
+var source = $('#source');
+$('#append-hover').hover(function () {
+  $('#target').append(source);
+}, function () {
+  $('#target').before(source).remove(source);
+});
+</script>
+<ul>
+<li><code>append</code> method will inject elements (selected by $) inside the object.</li>
+<li>The opposite is <code>remove</code>.</li>
+<li>If you want to inject a copy instead of original one, use <code>$('#source').clone()</code> instead.</li>
+<li>Some other common methods are: <code>after</code>, <code>before</code>.....</li>
+</ul>
+</div>
+<div id="dom-manipulation-contd-7" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li><strong>Animation</strong>: Some jQuery methods encapsulating underlying css / time operations.</li>
+<li><code>fadeIn</code>, <code>fadeOut</code>: elements fade in / away in the given time interval.</li>
+<li><code>show</code>, <code>hide</code>: elements show / hide immediately.</li>
+</ul>
+</div>
+<div id="dom-manipulation-contd-8" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li><p>Consider the following HTML, Javascript snippets:</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&#39;fade-away&#39;</span><span class="kw">&gt;</span>
+  I&#39;m gonna be gone.
+<span class="kw">&lt;/div&gt;</span></code></pre></td></tr></table>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(<span class="st">&#39;#fade-away&#39;</span>).<span class="fu">fadeOut</span>(<span class="dv">1000</span>, <span class="kw">function</span> () {
+  <span class="ot">window</span>.<span class="fu">alert</span>(<span class="st">&#39;BOOM!&#39;</span>);
+});</code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="dom-manipulation-contd-9" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li>See the live demo:</li>
+</ul>
+<span id="fade-hover"><em>[Hover over me to see demo.]</em></span>
+<div id="fade-away">
+<p>I'm gonna be gone.</p>
+</div>
+<script type='text/javascript'>
+$('#fade-hover').hover(function () {
+  $('#fade-away').fadeOut(1000, function () {
+    window.alert('BOOM!');
+    $(this).show();
+  });
+}, function () {
+});
+</script>
+<ul>
+<li>It shows that <code>#fade-away</code> object will fade out in <code>1000</code> milliseconds.
+<ul>
+<li>It can also be <code>slow</code>, <code>fast</code> string.</li>
+</ul></li>
+<li>After it's completely gone, the callback will trigger, showing one alert box.</li>
+<li>Callback function is optional, you can disable it by simply not giving a callback function.</li>
+</ul>
+</div>
+<div id="dom-manipulation-contd-10" class="slide section level1">
+<h1>DOM Manipulation (Cont'd)</h1>
+<ul>
+<li>For all manipulation API, consult: <a href="http://api.jquery.com/category/manipulation/" class="uri">http://api.jquery.com/category/manipulation/</a></li>
+</ul>
+</div>
+<div id="event-driven-programming" class="slide section level1">
+<h1>Event-driven Programming</h1>
+<ul>
+<li>To make your program interact with users, your program need to know how to respond user action.</li>
+<li><strong>Event</strong>: Certain <strong>action</strong> occurring upon certain <strong>elements</strong>. (ex: <code>click</code> on <code>#sampleObject</code>)</li>
+<li><strong>Handler</strong>: The piece codes executed when some events are triggered, usually represented in the form of function in JavaScript.</li>
+<li>You actually have seen that in previous example, while all demo programs are <em>triggered</em> by <em>hovering</em> your mouse over certain <em>area</em>.</li>
+<li>Some rules about event-driven programming:
+<ul>
+<li>Bind / unbind function to elements' event.</li>
+<li>Event bubbling.</li>
+<li>Avoid conflict.</li>
+</ul></li>
+</ul>
+</div>
+<div id="event-driven-programming-contd" class="slide section level1">
+<h1>Event-driven Programming (Cont'd)</h1>
+<ul>
+<li><p>Consider the following HTML, JavaScript snippets:</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;div</span><span class="ot"> id=</span><span class="st">&#39;binding-target&#39;</span><span class="kw">&gt;</span>
+Can&#39;t click me.
+<span class="kw">&lt;/div&gt;</span></code></pre></td></tr></table>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(<span class="st">&#39;#binding-target&#39;</span>).<span class="fu">html</span>(<span class="st">&#39;Can click me.&#39;</span>)
+                    .<span class="fu">on</span>(<span class="st">&#39;click&#39;</span>, <span class="kw">function</span> (e) {
+  <span class="fu">$</span>(<span class="kw">this</span>).<span class="fu">html</span>(<span class="st">&#39;I was hit! not again plz!&#39;</span>);
+  <span class="ot">window</span>.<span class="fu">alert</span>(<span class="st">&#39;Event Type: &#39;</span>+ <span class="ot">e</span>.<span class="fu">type</span>);
+  <span class="kw">return</span> <span class="kw">false</span>;
+});</code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="event-driven-programming-contd-1" class="slide section level1">
+<h1>Event-driven Programming (Cont'd)</h1>
+<ul>
+<li>See the live demo:</li>
+</ul>
+<span id="binding-click">[Click me to bind]</span>
+<div id="binding-target">
+<p>Can't click me.</p>
+</div>
+<script type='text/javascript'>
+var bindFn = function (e) {
+  $(this).html('<p>I was hit! not again plz!</p>');
+  window.alert('Event Type: '+ e.type);
+  return false;
+};
+$('#binding-target').click(function () {
+  return false;
+});
+$('#binding-click').on('click', function (e) {
+  $(this).text('[Event already bound.]');
+  $('#binding-target').html('<p>Can click me.</p>')
+                      .off('click')
+                      .on('click', bindFn);
+  $(this).off('click');
+  return false;
+});
+</script>
+</div>
+<div id="event-driven-programming-contd-2" class="slide section level1">
+<h1>Event-driven Programming (Cont'd)</h1>
+<ul>
+<li><code>.on( events [, selector ] [, data ], handler )</code></li>
+<li><code>on</code> method registers function to events. (such as <code>click</code>, <code>hover</code>...)
+<ul>
+<li>Function invoked when certain event is triggered.</li>
+<li>Apart from browser built-in events, you can design your own event.</li>
+</ul></li>
+<li>In your handler function, you can supply <code>e</code> as event object.</li>
+<li>The opposite of <code>on</code> is <code>off</code></li>
+<li>Minor: There's another way to invoke which supplies children selector. It works by delegating your event to those matched selection.</li>
+<li>API: <a href="http://api.jquery.com/on/" class="uri">http://api.jquery.com/on/</a></li>
+</ul>
+</div>
+<div id="event-driven-programming-contd-3" class="slide section level1">
+<h1>Event-driven Programming (Cont'd)</h1>
+<ul>
+<li>DOM elements usually nested inside each other, the handler of the parent works even if you click on it’s child.</li>
+<li>Event bubbling: After an event triggers on the deepest possible element, it then triggers on parents in nesting order.</li>
+<li>Sometimes it may cause problem,
+<ul>
+<li>For example, in this slide (web version), you go to the next by clicking, imagine what will happened if I didn't take precaution (in which case of course I did, self five!) in the previous example.</li>
+</ul></li>
+</ul>
+</div>
+<div id="event-driven-programming-contd-4" class="slide section level1">
+<h1>Event-driven Programming (Cont'd)</h1>
+<ul>
+<li>Remember <code>e</code> (as event object) in handler function?</li>
+<li>It provides two methods:
+<ul>
+<li><code>stopPropagation</code>: It stops itself from bubbling to the parent.</li>
+<li><code>preventDefault</code>: It prevent its default action from happening. (such as form submitting.)</li>
+</ul></li>
+<li><code>return false</code> = <code>stopPropagation</code> + <code>preventDefault</code> + <code>return</code>. (returning value does no good in handler function, right?)</li>
+</ul>
+</div>
+<div id="event-driven-programming-contd-5" class="slide section level1">
+<h1>Event-driven Programming (Cont'd)</h1>
+<ul>
+<li>In time, you may develop more complicated program require dynamically binding / unbinding.</li>
+<li><p>It's good habit to unbind old handler before new one is attached:</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(<span class="st">&#39;#target-binding&#39;</span>).<span class="fu">off</span>(<span class="st">&#39;click&#39;</span>)
+                    .<span class="fu">on</span>(<span class="st">&#39;click&#39;</span>, <span class="kw">function</span> () {
+...});</code></pre></td></tr></table></li>
+<li><p>To avoid conflict and strange behaviour, best keep your logic simple. (think about, is there cleaner way to express equivalent program logic?)</p></li>
+</ul>
+</div>
+<div id="event-driven-programming-contd-6" class="slide section level1">
+<h1>Event-driven Programming (Cont'd)</h1>
+<ul>
+<li>Shortcut: <code>on('click', handler)</code> can be expressed as <code>click(handler)</code></li>
+<li>This applies to : <code>change</code> (when value of form changes), <code>submit</code> (right before the form is submitted), and such..</li>
+</ul>
+</div>
+<div id="event-driven-programming-contd-7" class="slide section level1">
+<h1>Event-driven Programming (Cont'd)</h1>
+<ul>
+<li>Actually, <code>ready</code> is also a binding, (<code>$(document).ready</code>)</li>
+<li>For all available event, consult API: <a href="https://api.jquery.com/category/events/" class="uri">https://api.jquery.com/category/events/</a></li>
+</ul>
+</div>
+<div id="http-protocol" class="slide section level1">
+<h1>HTTP Protocol</h1>
+<ul>
+<li>Application protocol underlying browser communication.</li>
+<li>Request: client constructs a request to server. (along with information.)</li>
+<li>Response: server will send a response to client.</li>
+</ul>
+</div>
+<div id="http-protocol-1" class="slide section level1">
+<h1>HTTP Protocol</h1>
+<pre><code>*   Trying 193.203.65.45...
+* Connected to pinewoodpictures.com (193.203.65.45) port 80 (#0)
+&gt; GET /film/spooks-the-greater-good/ HTTP/1.1
+&gt; Host: pinewoodpictures.com
+&gt; User-Agent: curl/7.42.0
+&gt; Accept: */*
+&gt;
+&lt; HTTP/1.1 200 OK
+&lt; Date: Mon, 04 May 2015 16:14:18 GMT
+&lt; Server: Apache
+&lt; X-Powered-By: PHP/5.4.35
+&lt; X-Pingback: http://pinewoodpictures.com/xmlrpc.php
+&lt; Link: &lt;http://pinewoodpictures.com/?p=292&gt;; rel=shortlink
+&lt; Connection: close
+&lt; Transfer-Encoding: chunked
+&lt; Content-Type: text/html; charset=UTF-8
+&lt;
+&lt;!doctype html&gt; .... content omitted.</code></pre>
+</div>
+<div id="http-protocol-2" class="slide section level1">
+<h1>HTTP Protocol</h1>
+<ul>
+<li>The first part is your request header, and the second is the response.</li>
+<li>Request Method: what kind of operation you intended to do on server ('GET', 'POST', and etc...)</li>
+<li>Status Code: The response code indicates the status of the operation (200 for OK, 404 for not found...)</li>
+<li>You can inspect the information within the browser, using [Inspect Element] &gt; [Network]</li>
+</ul>
+</div>
+<div id="ajax" class="slide section level1">
+<h1>AJAX</h1>
+<ul>
+<li>AJAX stands for Asynchronous JavaScript and XML.</li>
+<li>Instead of one specific technology, AJAX is composed of several different technologies, and the use of XML is not a must.</li>
+<li>Intuitively, it use JavaScript code to retrieve partial content from server (string mostly), and do something with the retrieved content.
+<ul>
+<li>Hence it frees us from constant reloading and better desktop-alike user experience.</li>
+</ul></li>
+</ul>
+</div>
+<div id="ajax-1" class="slide section level1">
+<h1>AJAX</h1>
+<ul>
+<li>Generally, the AJAX procedure in JavaScript goes like:
+<ol style="list-style-type: decimal">
+<li>Prepare your HTTP request: specify the request url, method (<code>GET</code>, <code>POST</code>..), request parameter and callback function.</li>
+<li>After you send your request, you let your callback function to handle the rest. (known as asynchronous programming)</li>
+<li>If it got data from server, usually in the form of JSON (or XML), the callback function is invoked.
+<ul>
+<li>JSON (or XML) is plain string able to be converted (deserialise, with <code>JSON.parse</code>) to data structure, or the other way around (serialise, with <code>JSON.stringify</code>).</li>
+<li>JSON, JavaScript Simple Object Notation: boolean, number, string, array, object and friends. (sounds familiar?)</li>
+<li>You can operate on the data structure in the callback function after that.</li>
+</ul></li>
+</ol></li>
+</ul>
+</div>
+<div id="serialisation-deserialisation-of-json" class="slide section level1">
+<h1>Serialisation / Deserialisation of JSON</h1>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> obj = {
+  <span class="dt">foo</span>: <span class="st">&#39;bar&#39;</span>,
+  <span class="dt">zoo</span>: <span class="st">&#39;car&#39;</span>
+};
+<span class="kw">var</span> jsonString = <span class="ot">JSON</span>.<span class="fu">stringify</span>(obj);
+jsonString;
+<span class="co">//: &quot;{&quot;foo&quot;:&quot;bar&quot;,&quot;zoo&quot;:&quot;car&quot;}&quot;</span>
+<span class="kw">typeof</span> jsonString;
+<span class="co">//: &quot;string&quot;</span>
+<span class="kw">var</span> obj2 = <span class="ot">JSON</span>.<span class="fu">parse</span>(jsonString);
+obj2;
+<span class="co">//: Object { foo: &quot;bar&quot;, zoo: &quot;car&quot; }</span></code></pre></td></tr></table>
+</div>
+<div id="ajax-2" class="slide section level1">
+<h1>$.ajax</h1>
+<ul>
+<li>To do AJAX in native browser API can be really tedious. (browser compatibility mostly.)</li>
+<li>jQuery provides <code>\$.ajax</code> function to simplify the task.</li>
+<li>API: <a href="http://api.jquery.com/jquery.ajax/" class="uri">http://api.jquery.com/jquery.ajax/</a></li>
+</ul>
+</div>
+<div id="ajax-3" class="slide section level1">
+<h1>$.ajax</h1>
+<ul>
+<li><code>jQuery.ajax( url [, settings ] )</code>
+<ul>
+<li>Note there's no selection this time.</li>
+</ul></li>
+<li><code>url</code>: the request url.</li>
+<li><code>settings</code> is a object containing the detail of the request and callback. Some common ones are:
+<ul>
+<li><code>method</code>: HTTP method you would like to perform, such as 'GET', 'POST'</li>
+<li><code>data</code>: the parameters sent along with the request, can be object ({a: 0, b: 1}), parameter string ('a=0&amp;b=1')</li>
+<li><code>success</code>: A function to be called if the request succeeds.
+<ul>
+<li><code>Function( Anything data, String textStatus, jqXHR jqXHR )</code></li>
+<li>success if HTTP status code in the range of 200 to 299, or 304.</li>
+</ul></li>
+<li><code>error</code>: A function to be called if the request fails
+<ul>
+<li><code>Function( Anything data, String textStatus, jqXHR jqXHR )</code></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="ajax-4" class="slide section level1">
+<h1>$.ajax</h1>
+<ul>
+<li><ul>
+<li><code>complete</code>: A function to call after <code>success</code> and <code>error</code> is called.</li>
+<li><code>headers</code>: You can put customised HTTP headers here. (usually helpful when it comes to authorisation..)</li>
+</ul></li>
+</ul>
+</div>
+<div id="ajax-5" class="slide section level1">
+<h1>$.ajax</h1>
+<ul>
+<li>Example: <a href="http://api.hostip.info/get_json.php" class="uri">http://api.hostip.info/get_json.php</a></li>
+<li><p>Please use browser to open it, you shall see:</p>
+<table class="sourceCode json numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+</pre></td><td class="sourceCode"><pre><code class="sourceCode json"><span class="fu">{</span><span class="dt">&quot;country_name&quot;</span><span class="fu">:</span><span class="st">&quot;TAIWAN&quot;</span><span class="fu">,</span>
+ <span class="dt">&quot;country_code&quot;</span><span class="fu">:</span><span class="st">&quot;TW&quot;</span><span class="fu">,</span>
+ <span class="dt">&quot;city&quot;</span><span class="fu">:</span><span class="st">&quot;Taipei&quot;</span><span class="fu">,</span>
+ <span class="dt">&quot;ip&quot;</span><span class="fu">:</span><span class="st">&quot;140.112.102.93&quot;</span><span class="fu">}</span></code></pre></td></tr></table></li>
+<li><p>This can be seen as <code>data</code> object in the success callback function later.</p></li>
+</ul>
+</div>
+<div id="ajax-6" class="slide section level1">
+<h1>$.ajax</h1>
+<ul>
+<li><p>Considering the following HTML and JavaScript:</p>
+<table class="sourceCode html numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;button</span><span class="ot"> id=</span><span class="st">&#39;what-my-ip&#39;</span><span class="kw">&gt;</span>What is my IP?<span class="kw">&lt;/button&gt;</span></code></pre></td></tr></table>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="fu">$</span>(<span class="st">&#39;#what-my-ip&#39;</span>).<span class="fu">click</span>(<span class="kw">function</span> () {
+  <span class="ot">$</span>.<span class="fu">ajax</span>(<span class="st">&#39;http://api.hostip.info/get_json.php&#39;</span>, {
+    <span class="dt">method</span>: <span class="st">&#39;GET&#39;</span>,
+    <span class="dt">success</span>: <span class="kw">function</span> (data) {
+      <span class="ot">window</span>.<span class="fu">alert</span>(<span class="st">&#39;Hello sir, you came from &#39;</span> +
+      <span class="ot">data</span>.<span class="fu">city</span> + <span class="st">&#39;, &#39;</span> + <span class="ot">data</span>.<span class="fu">country_name</span> +
+      <span class="st">&#39;, and your IP address is &#39;</span> + <span class="ot">data</span>.<span class="fu">ip</span>);
+    }
+  });
+  <span class="kw">return</span> <span class="kw">false</span>; 
+});</code></pre></td></tr></table></li>
+</ul>
+</div>
+<div id="ajax-7" class="slide section level1">
+<h1>$.ajax</h1>
+<ul>
+<li>See the live demo:</li>
+</ul>
+<button id="what-my-ip">
+What is my IP?
+</button>
+<script type='text/javascript'>
+    $('#what-my-ip').click(function () {
+      $.ajax('http://api.hostip.info/get_json.php', {
+        method: 'GET',
+        success: function (data) {
+          window.alert('Hello sir, you came from ' +
+          data.city + ', ' + data.country_name +
+          ', and your IP address is ' + data.ip);
+        }
+      });
+      return false; 
+    });
+</script>
+</div>
+<div id="ajax-8" class="slide section level1">
+<h1>$.ajax</h1>
+<ul>
+<li>$.ajax is the core low-level interface in jQuery, there are some shortcuts available:
+<ul>
+<li>$.get, $.getJSON, $.post...</li>
+</ul></li>
+<li>Consult API: <a href="http://api.jquery.com/category/ajax/shorthand-methods/" class="uri">http://api.jquery.com/category/ajax/shorthand-methods/</a></li>
+<li>Notice in Chrome, you need to put your website on the server or AJAX won't work.</li>
+<li>To debug with remote API, some tools comes handy:
+<ul>
+<li><a href="https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm">Postman - REST Client</a>: a tool on Google Chrome to inspect RESTful API.</li>
+<li><a href="https://addons.mozilla.org/en-US/firefox/addon/restclient/?src=search">RESTClient, a debugger for RESTful web services.</a>: Firefox people's Postman.</li>
+<li>curl: hardcore unix programmer use it. (not me.)</li>
+</ul></li>
+</ul>
+</div>
+<div id="jquery-plugins-bootstrap" class="slide section level1">
+<h1>jQuery Plugins (Bootstrap)</h1>
+<ul>
+<li>jQuery plugins extends jQuery's functionality to allow you do much with little effort.</li>
+<li>It's impossible to cover all kind use of plugins, so the really important thing is to know how to read plugins manual instead.</li>
+<li>Some recommended tips:
+<ol style="list-style-type: decimal">
+<li>Read <code>Get started</code>, <code>Quick start</code> to get the plugin run first.</li>
+<li>If you can't directly dump in API doc, see if some tutorial available.</li>
+<li>Read API doc carefully to know how to use.</li>
+</ol></li>
+<li><p>For some non-trivial plugin, it usually involves some mental model to understand. Get it first and you will learn how to use it more efficiently.</p></li>
+<li><p>Here, we takes <code>Bootstrap</code> jQuery plugins for example: <a href="http://getbootstrap.com/javascript/" class="uri">http://getbootstrap.com/javascript/</a></p></li>
+</ul>
+</div>
+</body>
+</html>
